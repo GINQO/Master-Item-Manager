@@ -1,0 +1,74 @@
+<style>
+  th,
+  td,
+  table,
+  tr {
+    color: inherit;
+    vertical-align: top;
+    border: 1px solid #f2f2f2;
+    background-color: inherit;
+    padding-top: .23076923em;
+    padding-bottom: .23076923em;
+  }
+
+  tr,
+  td,
+  th {
+    width: 200px;
+  }
+</style>
+
+<lui-dialog style="max-width: 1200px;">
+  <lui-dialog-header>
+    <lui-dialog-title>Help</lui-dialog-title>
+  </lui-dialog-header>
+  <lui-dialog-body>
+    <h1>Extension Instructions: </h1><br>
+    <ol>
+      <li>Import your metrics using <a href="https://ginqo.box.com/s/altga7hukg16bnzqb7tn1k7i7biqd0jf" target="_blank">this template</a></li>
+      <li>If you only want to import some of those Master Items, then select them from a Filter Item or Table</li>
+      <li>Click "Create" to import all (or selected) Master Items</li>
+      <li>Click "Delete" to remove all master items</li>
+    </ol>
+    
+  </lui-dialog-body>
+  <lui-dialog-footer>
+    <button class="lui-button  lui-dialog__footer-button" ng-click="close();">Close</button>
+  </lui-dialog-footer>
+</lui-dialog>
+
+
+<!--
+  <table>
+      <tr>
+        <th>Measure Name</th>
+        <th>Measure Description</th>
+        <th>Measure Label Expression</th>
+        <th>Measure Expression</th>
+        <th>Measure Tags</th>
+        <th>Measure Color</th>
+        <th>Measure Id</th>
+      </tr>
+      <tr ng-repeat="row in measurevalues.qHyperCube.qDataPages[0].qMatrix">
+        <td ng-repeat="col in row">
+          {{col.qText}}
+        </td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <th>Dimension Name</th>
+        <th>Dimension Field</th>
+        <th>Dimension Label Expression</th>
+        <th>Dimension Description</th>
+        <th>Dimension Color</th>
+        <th>Dimension Tags</th>
+        <th>Dimension Id</th>
+      </tr>
+      <tr ng-repeat="row in dimensionvalues.qHyperCube.qDataPages[0].qMatrix">
+        <td ng-repeat="col in row">
+          <div id="dialogSelect" class="selectable" ng-class="{'selected':cell.selected}" ng-click="cell.select($event)">{{col.qText}}</div>
+        </td>
+      </tr>
+    </table>
+-->
