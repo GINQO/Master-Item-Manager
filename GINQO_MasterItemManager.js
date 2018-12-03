@@ -107,7 +107,7 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 					var arrayMeasures = [];
 					var arrayDimensions = [];
 					swal({
-							title: "Are you sure?",
+							title: "Create Master Items?",
 							text: "",
 							icon: "info",
 							buttons: true,
@@ -231,11 +231,14 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 
 								app.doReload(0, true, false);
 
-								swal("Master Items created!", {
+								swal({
+									title:"Master Items created!", 
 									icon: "success",
 								});
 							} else {
-								swal("Master Items not created.");
+								swal({
+									title:"Master Items not created."
+								});
 							}
 						});
 
@@ -243,6 +246,78 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 
 
 				}
+
+				$scope.UpdateSelected = function() {
+					// For each element that exists in MIM Definition => Do something
+					measurevalues.rows.forEach(row => {
+						enigma.app.getMeasure(row.cells[6].qText).then(reply =>{
+							reply.setProperties({
+								"qInfo": {
+									"qType": "measure",
+									"qId": row.cells[6].qText.replace("-", "")
+								},
+								"qMeasure": {
+									"qLabel": row.cells[0].qText.replace("-", ""),
+									"qDef": row.cells[3].qText.replace("-", ""),
+									"qGrouping": "N",
+									"qLabelExpression": `${row.cells[2].qText.replace("-", "")}`, // wrap this string in ='' so Qlik understands it as an expression
+									"qExpressions": [],
+									"coloring": {
+										"baseColor": {
+											"color": row.cells[5].qText.replace("-", ""),
+											"index": -1
+										},
+									},
+									"qActiveExpression": 0
+								},
+								"qMetaDef": {
+									"title": row.cells[0].qText.replace("-", ""),
+									"description": `${row.cells[1].qText.replace("-", "")}`, // Description:
+									"tags": [row.cells[4].qText.replace("-", "")], //Tags:
+								}
+							}).then(reply => {
+								swal({
+									text:"Master Items Updated."
+								})
+							})
+						})
+					});
+					dimensionvalues.rows.forEach(row => {
+						enigma.app.getDimension(row.cells[6].qText).then(reply =>{
+							reply.setProperties({
+								"qInfo": {
+									"qType": "dimension",
+									"qId": row.cells[6].qText.replace("-", "")
+								},
+								"qDim": {
+									//	"title": "something",
+									"qGrouping": "N",
+									"qLabelExpression": `${row.cells[2].qText.replace('-', '')}`,
+									"qFieldDefs": [
+										row.cells[1].qText.replace("-", "") //Dimension Field:
+									],
+									//"qFieldLabels": ["TEST"],
+									"title": row.cells[0].qText.replace("-", ""),
+									"coloring": {
+										"baseColor": {
+											"color": row.cells[4].qText.replace("-", ""), // Dimension Color:
+											"index": -1
+										},
+									},
+								},
+								"qMetaDef": {
+									"title": row.cells[0].qText.replace("-", ""), //Dimension Name
+									"description": row.cells[3].qText.replace("-", ""), //Desciption:
+									"tags": [row.cells[5].qText.replace("-", "")], //Tags
+								}
+							}).then(reply => {
+								swal({
+									text:"Master Items Updated."
+								})
+							})
+						})
+					});
+				};
 				// List all Master Items for Import
 				$scope.ListImportMasterItems = function () {
 					app.createGenericObject({
@@ -257,8 +332,8 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 				// Destroy Master items
 				$scope.DestroyAllMeasures = function () {
 					swal({
-							title: "Are you sure?",
-							text: "Click OK to delete Master Items (Dimensions and Metrics). Visualizations will NOT be deleted.",
+							title: "Are you sure you want to Delete All Master items?",
+							text: "Visualizations will NOT be affected.",
 							icon: "warning",
 							buttons: true,
 							dangerMode: true,
@@ -317,16 +392,37 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 										})
 									})
 								})
-								swal("Master items have been deleted.", {
+								swal({
+									title: "Master items have been deleted.", 
 									icon: "success",
 								});
 							} else {
-								swal("Not deleted");
+								swal({
+									title:"Not deleted"
+								});
 							}
 						});
 
 
 				};
+
+				$scope.DestroyDimension = function () {
+					// The Engine API DestroyMeasure function: https://help.qlik.com/en-US/sense-developer/September2018/APIs/EngineAPI/services-Doc-DestroyMeasure.html
+					console.log("Test")
+
+					dimensionvalues.rows.forEach(element => {
+						enigma.app.destroyDimension(element.cells[6].qText)
+					})
+				//	console.log(dimensionvalues.rows)
+				}
+
+				$scope.DestroyMeasure = function(){
+					measurevalues.rows.forEach(element => {
+						enigma.app.destroyMeasure(element.cells[6].qText)
+					});
+				}
+				
+
 
 				/*********************************************************************************************************************************************/
 				/***************************     RETRIEVE OBJECTS FOR MASTER ITEM DATA, EXPORT TO CSV     ****************************************************/

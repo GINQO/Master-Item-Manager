@@ -7,7 +7,13 @@
   transform: translate(-50%, -50%);
 }
 .masteritembutton{
-	width: 250px
+	width: 340px
+}
+.masteritemdelete{
+	width:170px
+}
+.masteritemdeleteall{
+	width:100px
 }
 .instructions{
 	width:250px
@@ -41,14 +47,20 @@
 				<button title="Export Variables" style="left: 0%" ng-click="ExportVariables()" class="lui-button  lui-button--default">
 					<span class="lui-fade-button__icon lui-icon lui-icon--variables"></span>
 			</button>
+			<button ng-click="DestroyAllMeasures();" style="left: 0%" class="lui-button lui-button--danger">
+					<span class="lui-fade-button__icon lui-icon lui-icon--disconnect"></span>
+			</button>
 			</div>
 			<br><br><br>
 			<h1><span class="lui-icon  lui-icon--cogwheel" aria-hidden="true"></span>  Import Master Items</h1>
 			<br>
 			<button ng-click="CreateMeasure();" class="masteritembutton lui-button lui-button">Create</button><br>
-			<button ng-click="UpdateMeasures();" class="masteritembutton lui-button lui-button">Update</button><br>
-			<button ng-click="DestroyAllMeasures();" class="masteritembutton lui-button lui-button--default">Delete</button>
-		
+			<button ng-click="UpdateSelected();" class="masteritembutton lui-button lui-button">Update</button><br>
+			<div class="lui-buttongroup">
+			<button ng-click="DestroyDimension();" class="masteritemdelete lui-button lui-button--default">Delete Dimensions</button>
+			<button ng-click="DestroyMeasure();" class="masteritemdelete lui-button lui-button--default">Delete Measure</button>
+			
+			</div>
 	<!-- <button class="instructions lui-button" ng-click="openDialog()">Instructions: </button> -->
 	
 		</div>
