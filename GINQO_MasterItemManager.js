@@ -1,5 +1,5 @@
-define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.html', 'text!./dialog-template2.ng.html', './lib/swal'],
-	function ($, qlik, template, dialogTemplate, dialogTemplate2) {
+define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.html', 'text!./dialog-template2.ng.html', 'text!./dialog-template3.ng.html', 'text!./dialog-template4.ng.html', './lib/swal'],
+	function ($, qlik, template, dialogTemplate, dialogTemplate2, dialogTemplate3, dialogTemplate4) {
 		'use strict';
 	
 		
@@ -87,6 +87,534 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 						}]
 					});
 				};
+				$scope.openDialogDim = function () {
+					luiDialog.show({
+						template: dialogTemplate3,
+						input: {
+							name: $scope.name
+						},
+						controller: ['$scope', '$element', function ($scope, $element) {
+							var measurevalues = app.createTable(['%MI%MeasureName', '%MI%MeasureDescription', '%MI%MeasureLabelExpression', '%MI%MeasureExpression', '%MI%MeasureTags', '%MI%MeasureColor', '%MI%MeasureId'], {
+								rows: 200
+							});
+							var dimensionvalues = app.createTable(['%MI%DimensionName', '%MI%DimensionField', '%MI%DimensionLabelExpression', '%MI%DimensionDescription', '%MI%DimensionColor', '%MI%DimensionTags', '%MI%DimensionId'], {
+								rows: 200
+							});
+							$scope.measurevalues = measurevalues;
+							$scope.dimensionvalues = dimensionvalues;
+			
+							
+							// Create a table of all selected apps
+							var appList = app.createTable(['id_u1'], {
+								rows: 200
+							});
+			
+							// Create Create Master Items Using the EngineAPI
+							$scope.CreateDimension = function () {
+								var arrayMeasures = [];
+								var arrayDimensions = [];
+										
+											enigma.app.createSessionObject({
+												qDimensionListDef: {
+													qType: 'dimension',
+													qData: {
+														info: '/qDimInfos',
+														dimension: '/qDim'
+													},
+													qMeta: {}
+												},
+												qInfo: {
+													qId: "DimensionList",
+													qType: "DimensionList"
+												}
+											}).then((list) => {
+												list.getLayout().then((layout) => {
+													layout.qDimensionList.qItems.forEach((element) => {
+														console.log(element.qInfo.qId);
+														arrayDimensions.push(element.qInfo.qId);
+													})
+												}).then(() => {
+													dimensionvalues.rows.forEach(function (row, rowno) {
+			
+														if (!arrayDimensions.includes(row.cells[6].qText)) {
+															enigma.app.createDimension({
+																"qInfo": {
+																	"qType": "dimension",
+																	"qId": row.cells[6].qText.replace("-", "")
+																},
+																"qDim": {
+																	//	"title": "something",
+																	"qGrouping": "N",
+																	"qLabelExpression": `${row.cells[2].qText.replace('-', '')}`,
+																	"qFieldDefs": [
+																		row.cells[1].qText.replace("-", "") //Dimension Field:
+																	],
+																	//"qFieldLabels": ["TEST"],
+																	"title": row.cells[0].qText.replace("-", ""),
+																	"coloring": {
+																		"baseColor": {
+																			"color": row.cells[4].qText.replace("-", ""), // Dimension Color:
+																			"index": -1
+																		},
+																	},
+																},
+																"qMetaDef": {
+																	"title": row.cells[0].qText.replace("-", ""), //Dimension Name
+																	"description": row.cells[3].qText.replace("-", ""), //Desciption:
+																	"tags": [row.cells[5].qText.replace("-", "")], //Tags
+																}
+															});
+														} else {
+															//swal("Duplicates found. Some dimensions may not have been imported.")
+														}
+													});
+												
+											})
+			
+											
+											app.doReload(0, true, false);
+			
+											swal({
+												text:"Dimensions Created.", 
+												icon: "success",
+											});
+										
+									});
+			
+			
+			
+			
+							}
+			
+							$scope.UpdateDimension = function() {
+								// For each element that exists in MIM Definition => Do something
+								dimensionvalues.rows.forEach(row => {
+									enigma.app.getDimension(row.cells[6].qText).then(reply =>{
+										reply.setProperties({
+											"qInfo": {
+												"qType": "dimension",
+												"qId": row.cells[6].qText.replace("-", "")
+											},
+											"qDim": {
+												//	"title": "something",
+												"qGrouping": "N",
+												"qLabelExpression": `${row.cells[2].qText.replace('-', '')}`,
+												"qFieldDefs": [
+													row.cells[1].qText.replace("-", "") //Dimension Field:
+												],
+												//"qFieldLabels": ["TEST"],
+												"title": row.cells[0].qText.replace("-", ""),
+												"coloring": {
+													"baseColor": {
+														"color": row.cells[4].qText.replace("-", ""), // Dimension Color:
+														"index": -1
+													},
+												},
+											},
+											"qMetaDef": {
+												"title": row.cells[0].qText.replace("-", ""), //Dimension Name
+												"description": row.cells[3].qText.replace("-", ""), //Desciption:
+												"tags": [row.cells[5].qText.replace("-", "")], //Tags
+											}
+										}).then(reply => {
+											swal({
+												text:"Dimensions Updated.", 
+												icon: "success",
+											});
+										})
+									})
+								});
+							};
+					
+							$scope.DestroyDimension = function () {
+								// The Engine API DestroyMeasure function: https://help.qlik.com/en-US/sense-developer/September2018/APIs/EngineAPI/services-Doc-DestroyMeasure.html
+								console.log("Test")
+			
+								dimensionvalues.rows.forEach(element => {
+									enigma.app.destroyDimension(element.cells[6].qText)
+								})
+								swal({
+									text:"Dimensions Deleted.", 
+									icon: "success",
+								});
+							//	console.log(dimensionvalues.rows)
+							}
+			
+							
+						
+						}]
+					});
+				};
+				$scope.openDialogMeas = function () {
+					luiDialog.show({
+						template: dialogTemplate4,
+						input: {
+							name: $scope.name
+						},
+						controller: ['$scope', '$element', function ($scope, $element) {
+							var measurevalues = app.createTable(['%MI%MeasureName', '%MI%MeasureDescription', '%MI%MeasureLabelExpression', '%MI%MeasureExpression', '%MI%MeasureTags', '%MI%MeasureColor', '%MI%MeasureId'], {
+								rows: 200
+							});
+							var dimensionvalues = app.createTable(['%MI%DimensionName', '%MI%DimensionField', '%MI%DimensionLabelExpression', '%MI%DimensionDescription', '%MI%DimensionColor', '%MI%DimensionTags', '%MI%DimensionId'], {
+								rows: 200
+							});
+							$scope.measurevalues = measurevalues;
+							$scope.dimensionvalues = dimensionvalues;
+			
+							
+							// Create a table of all selected apps
+							var appList = app.createTable(['id_u1'], {
+								rows: 200
+							});
+			
+							// Create Create Master Items Using the EngineAPI
+							$scope.CreateMeasure = function () {
+								var arrayMeasures = [];
+								var arrayDimensions = [];
+						
+			
+											enigma.app.createSessionObject({
+												qMeasureListDef: {
+													qType: 'measure',
+													qData: {
+														info: "/qMeasure"
+													},
+													qMeta: {}
+												},
+												qInfo: {
+													qId: "MeasureList",
+													qType: "MeasureList",
+												}
+											}).then((list) => {
+												list.getLayout().then((layout) => {
+													layout.qMeasureList.qItems.forEach((element) => {
+														console.log(element.qInfo.qId);
+														arrayMeasures.push(element.qInfo.qId);
+													})
+												}).then(() => {
+													measurevalues.rows.forEach(function (row, rowno) {
+														// If there exists a measureid already, don't create
+														if (!arrayMeasures.includes(row.cells[6].qText)) {
+															enigma.app.createMeasure({
+																"qInfo": {
+																	"qType": "measure",
+																	"qId": row.cells[6].qText.replace("-", "")
+																},
+																"qMeasure": {
+																	"qLabel": row.cells[0].qText.replace("-", ""),
+																	"qDef": row.cells[3].qText.replace("-", ""),
+																	"qGrouping": "N",
+																	"qLabelExpression": `${row.cells[2].qText.replace("-", "")}`, // wrap this string in ='' so Qlik understands it as an expression
+																	"qExpressions": [],
+																	"coloring": {
+																		"baseColor": {
+																			"color": row.cells[5].qText.replace("-", ""),
+																			"index": -1
+																		},
+																	},
+																	"qActiveExpression": 0
+																},
+																"qMetaDef": {
+																	"title": row.cells[0].qText.replace("-", ""),
+																	"description": `${row.cells[1].qText.replace("-", "")}`, // Description:
+																	"tags": [row.cells[4].qText.replace("-", "")], //Tags:
+																}
+															});
+														} else {
+															//swal("Duplicates found. Some measures may not have been imported")
+														}
+			
+													});
+												
+											})
+			
+			
+			
+											app.doReload(0, true, false);
+			
+											swal({
+												text:"Measures Created.", 
+												icon: "success",
+											});
+										
+									});
+							}
+			
+							$scope.CreateDimension = function () {
+								var arrayMeasures = [];
+								var arrayDimensions = [];
+								swal({
+										title: "Create Master Items?",
+										text: "",
+										icon: "info",
+										buttons: true,
+										dangerMode: false,
+									})
+									.then((create) => {
+										if (create) {
+			
+											enigma.app.createSessionObject({
+												qDimensionListDef: {
+													qType: 'dimension',
+													qData: {
+														info: '/qDimInfos',
+														dimension: '/qDim'
+													},
+													qMeta: {}
+												},
+												qInfo: {
+													qId: "DimensionList",
+													qType: "DimensionList"
+												}
+											}).then((list) => {
+												list.getLayout().then((layout) => {
+													layout.qDimensionList.qItems.forEach((element) => {
+														console.log(element.qInfo.qId);
+														arrayDimensions.push(element.qInfo.qId);
+													})
+												}).then(() => {
+													dimensionvalues.rows.forEach(function (row, rowno) {
+			
+														if (!arrayDimensions.includes(row.cells[6].qText)) {
+															enigma.app.createDimension({
+																"qInfo": {
+																	"qType": "dimension",
+																	"qId": row.cells[6].qText.replace("-", "")
+																},
+																"qDim": {
+																	//	"title": "something",
+																	"qGrouping": "N",
+																	"qLabelExpression": `${row.cells[2].qText.replace('-', '')}`,
+																	"qFieldDefs": [
+																		row.cells[1].qText.replace("-", "") //Dimension Field:
+																	],
+																	//"qFieldLabels": ["TEST"],
+																	"title": row.cells[0].qText.replace("-", ""),
+																	"coloring": {
+																		"baseColor": {
+																			"color": row.cells[4].qText.replace("-", ""), // Dimension Color:
+																			"index": -1
+																		},
+																	},
+																},
+																"qMetaDef": {
+																	"title": row.cells[0].qText.replace("-", ""), //Dimension Name
+																	"description": row.cells[3].qText.replace("-", ""), //Desciption:
+																	"tags": [row.cells[5].qText.replace("-", "")], //Tags
+																}
+															});
+														} else {
+															//swal("Duplicates found. Some dimensions may not have been imported.")
+														}
+													});
+												})
+											})
+			
+											
+											app.doReload(0, true, false);
+			
+											swal({
+												title:"Dimension Master Items created!", 
+												icon: "success",
+											});
+										} else {
+											swal({
+												title:"Dimension Master Items not created."
+											});
+										}
+									});
+			
+			
+			
+			
+							}
+			
+							$scope.UpdateMeasure = function() {
+								// For each element that exists in MIM Definition => Do something
+								measurevalues.rows.forEach(row => {
+									enigma.app.getMeasure(row.cells[6].qText).then(reply =>{
+										reply.setProperties({
+											"qInfo": {
+												"qType": "measure",
+												"qId": row.cells[6].qText.replace("-", "")
+											},
+											"qMeasure": {
+												"qLabel": row.cells[0].qText.replace("-", ""),
+												"qDef": row.cells[3].qText.replace("-", ""),
+												"qGrouping": "N",
+												"qLabelExpression": `${row.cells[2].qText.replace("-", "")}`, // wrap this string in ='' so Qlik understands it as an expression
+												"qExpressions": [],
+												"coloring": {
+													"baseColor": {
+														"color": row.cells[5].qText.replace("-", ""),
+														"index": -1
+													},
+												},
+												"qActiveExpression": 0
+											},
+											"qMetaDef": {
+												"title": row.cells[0].qText.replace("-", ""),
+												"description": `${row.cells[1].qText.replace("-", "")}`, // Description:
+												"tags": [row.cells[4].qText.replace("-", "")], //Tags:
+											}
+										}).then(reply => {
+											swal({
+												text:"Measure Master Items Updated.", 
+												icon: "success",
+											});
+										})
+									})
+								});
+							};
+							$scope.UpdateDimension = function() {
+								// For each element that exists in MIM Definition => Do something
+								dimensionvalues.rows.forEach(row => {
+									enigma.app.getDimension(row.cells[6].qText).then(reply =>{
+										reply.setProperties({
+											"qInfo": {
+												"qType": "dimension",
+												"qId": row.cells[6].qText.replace("-", "")
+											},
+											"qDim": {
+												//	"title": "something",
+												"qGrouping": "N",
+												"qLabelExpression": `${row.cells[2].qText.replace('-', '')}`,
+												"qFieldDefs": [
+													row.cells[1].qText.replace("-", "") //Dimension Field:
+												],
+												//"qFieldLabels": ["TEST"],
+												"title": row.cells[0].qText.replace("-", ""),
+												"coloring": {
+													"baseColor": {
+														"color": row.cells[4].qText.replace("-", ""), // Dimension Color:
+														"index": -1
+													},
+												},
+											},
+											"qMetaDef": {
+												"title": row.cells[0].qText.replace("-", ""), //Dimension Name
+												"description": row.cells[3].qText.replace("-", ""), //Desciption:
+												"tags": [row.cells[5].qText.replace("-", "")], //Tags
+											}
+										}).then(reply => {
+											swal({
+												text:"Measures Updated."
+											})
+										})
+									})
+								});
+							};
+							// List all Master Items for Import
+							$scope.ListImportMasterItems = function () {
+								app.createGenericObject({
+									qFieldListDef: {
+										qShowHidden: true,
+									}
+								}, function (reply) {
+									console.log(reply)
+								});
+							};
+				
+							// Destroy Master items
+							$scope.DestroyAllMeasures = function () {
+								swal({
+										title: "Warning. This will purge all of your Master Items in this app. Are you sure you want to continue?",
+										text: "Visualizations will NOT be affected.",
+										icon: "warning",
+										buttons: true,
+										dangerMode: true,
+									})
+									.then((willDelete) => {
+										if (willDelete) {
+											var measureArray = [];
+											var dimensionArray = [];
+											enigma.app.createSessionObject({
+												qMeasureListDef: {
+													qType: 'measure',
+													qData: {
+														info: "/qMeasure"
+													},
+													qMeta: {}
+												},
+												qInfo: {
+													qId: "MeasureList",
+													qType: "MeasureList",
+			
+												}
+											}).then((list) => {
+												list.getLayout().then((layout) => {
+													layout.qMeasureList.qItems.forEach((element) => {
+														measureArray.push(element.qInfo.qId)
+													})
+												}).then(() => {
+													console.log(measureArray);
+													measureArray.forEach(element => {
+														enigma.app.destroyMeasure(element);
+													})
+												});
+											});
+											enigma.app.createSessionObject({
+												qDimensionListDef: {
+													qType: 'dimension',
+													qData: {
+														info: '/qDimInfos',
+														dimension: '/qDim'
+													},
+													qMeta: {}
+												},
+												qInfo: {
+													qId: "DimensionList",
+													qType: "DimensionList"
+												}
+											}).then((list) => {
+												list.getLayout().then((layout) => {
+													layout.qDimensionList.qItems.forEach((element) => {
+														dimensionArray.push(element.qInfo.qId);
+													})
+												}).then(() => {
+													console.log(dimensionArray);
+													dimensionArray.forEach(element => {
+														enigma.app.destroyDimension(element);
+													})
+												})
+											})
+											swal({
+												title: "Master items have been deleted.", 
+												icon: "success",
+											});
+										} else {
+											swal({
+												title:"Not deleted"
+											});
+										}
+									});
+			
+			
+							};
+			
+							$scope.DestroyDimension = function () {
+								// The Engine API DestroyMeasure function: https://help.qlik.com/en-US/sense-developer/September2018/APIs/EngineAPI/services-Doc-DestroyMeasure.html
+								console.log("Test")
+			
+								dimensionvalues.rows.forEach(element => {
+									enigma.app.destroyDimension(element.cells[6].qText)
+								})
+							//	console.log(dimensionvalues.rows)
+							}
+			
+							$scope.DestroyMeasure = function(){
+								measurevalues.rows.forEach(element => {
+									enigma.app.destroyMeasure(element.cells[6].qText)
+								});
+								swal({
+									text:"Measures Deleted.", 
+									icon: "success",
+								});
+							}
+						
+						}]
+					});
+				};
 				var measurevalues = app.createTable(['%MI%MeasureName', '%MI%MeasureDescription', '%MI%MeasureLabelExpression', '%MI%MeasureExpression', '%MI%MeasureTags', '%MI%MeasureColor', '%MI%MeasureId'], {
 					rows: 200
 				});
@@ -107,8 +635,7 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 					var arrayMeasures = [];
 					var arrayDimensions = [];
 					swal({
-							title: "Create Master Items?",
-							text: "",
+							text: "Create Master Items?",
 							icon: "info",
 							buttons: true,
 							dangerMode: false,
@@ -172,6 +699,33 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 								})
 
 
+
+								app.doReload(0, true, false);
+
+								swal({
+									text:"Measure Master Items created!", 
+									icon: "success",
+								});
+							} else {
+								swal({
+									text:"Measure Master Items not created."
+								});
+							}
+						});
+				}
+
+				$scope.CreateDimension = function () {
+					var arrayMeasures = [];
+					var arrayDimensions = [];
+					swal({
+							text: "Create Master Items?",
+							icon: "info",
+							buttons: true,
+							dangerMode: false,
+						})
+						.then((create) => {
+							if (create) {
+
 								enigma.app.createSessionObject({
 									qDimensionListDef: {
 										qType: 'dimension',
@@ -229,15 +783,16 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 									})
 								})
 
+								
 								app.doReload(0, true, false);
 
 								swal({
-									title:"Master Items created!", 
+									text:"Dimension Master Items created!", 
 									icon: "success",
 								});
 							} else {
 								swal({
-									title:"Master Items not created."
+									title:"Dimension Master Items not created."
 								});
 							}
 						});
@@ -247,7 +802,7 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 
 				}
 
-				$scope.UpdateSelected = function() {
+				$scope.UpdateMeasure = function() {
 					// For each element that exists in MIM Definition => Do something
 					measurevalues.rows.forEach(row => {
 						enigma.app.getMeasure(row.cells[6].qText).then(reply =>{
@@ -282,6 +837,9 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 							})
 						})
 					});
+				};
+				$scope.UpdateDimension = function() {
+					// For each element that exists in MIM Definition => Do something
 					dimensionvalues.rows.forEach(row => {
 						enigma.app.getDimension(row.cells[6].qText).then(reply =>{
 							reply.setProperties({
@@ -332,7 +890,7 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 				// Destroy Master items
 				$scope.DestroyAllMeasures = function () {
 					swal({
-							title: "Are you sure you want to Delete All Master items?",
+							title: "Warning. This will purge all of your Master Items in this app. Are you sure you want to continue?",
 							text: "Visualizations will NOT be affected.",
 							icon: "warning",
 							buttons: true,

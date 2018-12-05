@@ -47,25 +47,36 @@
 				<button title="Export Variables" style="left: 0%" ng-click="ExportVariables()" class="lui-button  lui-button--default">
 					<span class="lui-fade-button__icon lui-icon lui-icon--variables"></span>
 			</button>
-			<button ng-click="DestroyAllMeasures();" style="left: 0%" class="lui-button lui-button--danger">
+			<button title="Purge Master Items" ng-click="DestroyAllMeasures();" style="left: 0%" class="lui-button lui-button--danger">
 					<span class="lui-fade-button__icon lui-icon lui-icon--disconnect"></span>
 			</button>
 			</div>
 			<br><br><br>
-			<h1><span class="lui-icon  lui-icon--cogwheel" aria-hidden="true"></span>  Import Master Items</h1>
+			<h1><span class="lui-icon  lui-icon--cogwheel" aria-hidden="true"></span>  Manage Master Items</h1>
 			<br>
-			<button ng-click="CreateMeasure();" class="masteritembutton lui-button lui-button">Create</button><br>
-			<button ng-click="UpdateSelected();" class="masteritembutton lui-button lui-button">Update</button><br>
 			<div class="lui-buttongroup">
-			<button ng-click="DestroyDimension();" class="masteritemdelete lui-button lui-button--default">Delete Dimensions</button>
-			<button ng-click="DestroyMeasure();" class="masteritemdelete lui-button lui-button--default">Delete Measure</button>
-			
+					<button ng-click="openDialogDim()" class="masteritemdelete lui-button">
+							<span class="lui-button__icon  lui-icon  lui-icon--menu"></span><span class="lui-button__text">Dimensions</span><span class="lui-button__caret  lui-caret"></span>
+					</button>
+					<button ng-click="openDialogMeas()" class="masteritemdelete lui-button">
+							<span class="lui-button__icon  lui-icon  lui-icon--menu"></span><span class="lui-button__text">Measures</span><span class="lui-button__caret  lui-caret"></span>
+					</button>
+
 			</div>
 	<!-- <button class="instructions lui-button" ng-click="openDialog()">Instructions: </button> -->
 	
 		</div>
-	<br><span><a href="https://ginqo.com" target="_blank">GINQO</a> Master Item Manager (Nov 2018, Build 1.1)</span>
+	<br>
+	<span><a href="https://ginqo.com" target="_blank">GINQO</a> Master Item Manager (Dec 2018, Build 1.0)</span>
 		
 	</div>
 	
 </div>
+
+
+<!--
+	<button class="masteritemdelete lui-button lui-button--large" ng-click="openDialogDim()">Dimensions <span class="lui-fade-button__icon lui-icon lui-icon--menu"></span></button>
+	<button class="masteritemdelete lui-button lui-button--large" ng-click="openDialogMeas()">Measures <span class="lui-fade-button__icon lui-icon lui-icon--menu"></span></button>
+
+
+-->

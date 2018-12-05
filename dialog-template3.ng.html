@@ -1,0 +1,93 @@
+<style>
+    th,
+    td,
+    table,
+    tr {
+      color: inherit;
+      vertical-align: top;
+      border: 1px solid #f2f2f2;
+      background-color: inherit;
+      padding-top: .23076923em;
+      padding-bottom: .23076923em;
+    }
+  
+    tr,
+    td,
+    th {
+      width: 200px;
+    }
+  </style>
+  
+  <lui-dialog style="max-width: 1200px;">
+    <lui-dialog-header>
+      <lui-dialog-title>Master Dimension Imports</lui-dialog-title>
+    </lui-dialog-header>
+    <lui-dialog-body>
+     
+
+  
+          
+      
+          <div style="text-align: center">
+            
+        <ul class="lui-list">
+            <li class="lui-list__header">
+              <span class="lui-list__text">Settings</span>
+            </li>
+            <li ng-click="CreateDimension();" class="lui-list__item">
+              <span class="lui-list__text">Insert</span>
+            </li>
+            <li ng-click="UpdateDimension();" class="lui-list__item">
+                <span class="lui-list__text">Update</span>
+            </li>
+            <li ng-click="DestroyDimension();" class="lui-list__item">
+                  <span class="lui-list__text">Delete</span>
+            </li>
+        
+          </ul>
+        
+          </div>
+
+          
+   
+    </lui-dialog-body>
+    <lui-dialog-footer>
+      <button class="lui-button  lui-dialog__footer-button" ng-click="close();">Close</button>
+    </lui-dialog-footer>
+  </lui-dialog>
+  
+  
+  <!--
+    <table>
+        <tr>
+          <th>Measure Name</th>
+          <th>Measure Description</th>
+          <th>Measure Label Expression</th>
+          <th>Measure Expression</th>
+          <th>Measure Tags</th>
+          <th>Measure Color</th>
+          <th>Measure Id</th>
+        </tr>
+        <tr ng-repeat="row in measurevalues.qHyperCube.qDataPages[0].qMatrix">
+          <td ng-repeat="col in row">
+            {{col.qText}}
+          </td>
+        </tr>
+      </table>
+      <table>
+        <tr>
+          <th>Dimension Name</th>
+          <th>Dimension Field</th>
+          <th>Dimension Label Expression</th>
+          <th>Dimension Description</th>
+          <th>Dimension Color</th>
+          <th>Dimension Tags</th>
+          <th>Dimension Id</th>
+        </tr>
+        <tr ng-repeat="row in dimensionvalues.qHyperCube.qDataPages[0].qMatrix">
+          <td ng-repeat="col in row">
+            <div id="dialogSelect" class="selectable" ng-class="{'selected':cell.selected}" ng-click="cell.select($event)">{{col.qText}}</div>
+          </td>
+        </tr>
+      </table>
+  -->
