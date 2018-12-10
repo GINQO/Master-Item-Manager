@@ -1198,14 +1198,78 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 								}
 							}
 						}
-					}).then((reply) => {		
+					}).then((reply) => {	
+
 						reply.getLayout().then(reply => {
+
 							// List of Variables;
-							
-									var vItemsNotFormatted = reply.qVariableList.qItems;
+							const varDef = reply.qVariableList.qItems.map(async element => {
+								const response = enigma.app.getVariableById(element.qInfo.qId);
+								return response;
+							});
+
+							const results = Promise.all(varDef);
+
+							results.then(reply => {
+
+								const variableProperties = reply.map(element => {
+									const response = element.getProperties();
+									return response;
+								})
+
+								const itemsNotFormatted = Promise.all(variableProperties)
+								//console.log(itemsNotFormatted2)
+								var headers = {
+									qName: "qName",
+									qVariable: "qDefinition",
+									qId: "qId",
+									qType: "qType",
+								};
+
+								var itemsFormatted = [];
+
+								itemsNotFormatted.then(item => {
+									
+									item.map(item => {
+										//console.log(item
+											console.log((item.qDefinition));
+											
+											
+											itemsFormatted.push({
+													qName: item.qName,
+													qDefinition: item.qDefinition, 
+													//qId: JSON.stringify(item.qInfo.qId),
+													//qType: JSON.stringify(item.qInfo.qType),
+											}) 
+									})
+
+//console.log(itemsFormatted)
+var fileTitle = 'VariableExport';
+		
+									
+console.log("test", itemsFormatted)
+exportCSVFile(headers, itemsFormatted, fileTitle); // call the exportCSVFile() function to process the JSON and trigger the download
+
+								})
+
+							})
 								
-								
-									var headers = {
+						
+									
+									
+						}) 
+
+
+					}) 
+					
+
+				
+				}
+
+				/*
+
+
+var headers = {
 										qName: "qName", // remove commas to avoid errors
 										qId: "qId",
 										qType: "qType",
@@ -1219,6 +1283,7 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 									// format the 
 									vItemsNotFormatted.map((item) => {
 										//console.log(item)
+										//.replace(/(\u005Cr\u005Cn)/g, '\n').replace(/(\u005Cn)/g, '\n'),
 											vItemsFormatted.push({
 												qName: JSON.stringify(item.qName), // remove commas to avoid errors
 												qId: JSON.stringify(item.qInfo.qId),
@@ -1232,15 +1297,11 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 									
 									console.log("test", vItemsFormatted)
 									exportCSVFile(headers, vItemsFormatted, fileTitle); // call the exportCSVFile() function to process the JSON and trigger the download
-									
-						}) 
-					}) 
-					
 
-				
-				}
 
-				/*
+
+
+
 				reply.getLayout().then(reply => {
 							// List of Measures (base form);
 							const measDef = reply.qMeasureList.qItems.map(async element => {
