@@ -10,8 +10,8 @@
 Qlik Sense >= 3.0
 
 # Usage
-1. From the Load Editor, create a Data Connection to the template excel file (provided)
-2. In your Qlik Sense Application, create one table for the template Dimensions and one for template Measures
+1. From the Load Editor, create a Data Connection to the template excel file (provided in zip)
+2. In your Qlik Sense Application, create one table for the template Dimensions and another for template Measures
 3. You can now use the Actions on the Master Items.
 
 # Actions
