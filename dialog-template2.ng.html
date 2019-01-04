@@ -1,54 +1,15 @@
 <style>
-  th,
-  td,
-  table,
-  tr {
-    color: inherit;
-    vertical-align: top;
-    border: 1px solid #f2f2f2;
-    background-color: inherit;
-
-  }
 
 </style>
 
 <lui-dialog style="max-width: 1400px;">
   <lui-dialog-header>
-    <lui-dialog-title>Master Item Import Overview</lui-dialog-title>
+    <lui-dialog-title>Settings</lui-dialog-title>
   </lui-dialog-header>
   <lui-dialog-body>
-      <table style="table-layout:fixed">
-          <tr>
-            <th>Measure Name</th>
-            <th>Measure Description</th>
-            <th>Measure Label Expression</th>
-            <th>Measure Expression</th>
-            <th>Measure Tags</th>
-            <th>Measure Color</th>
-            <th>Measure Id</th>
-          </tr>
-          <tr ng-repeat="row in measurevalues.qHyperCube.qDataPages[0].qMatrix">
-            <td ng-repeat="col in row">
-              {{col.qText}}
-            </td>
-          </tr>
-        </table>
-        <table style="table-layout:fixed">
-          <tr>
-            <th>Dimension Name</th>
-            <th>Dimension Field</th>
-            <th>Dimension Label Expression</th>
-            <th>Dimension Description</th>
-            <th>Dimension Color</th>
-            <th>Dimension Tags</th>
-            <th>Dimension Id</th>
-          </tr>
-          <tr ng-repeat="row in dimensionvalues.qHyperCube.qDataPages[0].qMatrix">
-            <td ng-repeat="col in row">
-              {{col.qText}}
-            </td>
-          </tr>
-        </table>
+    
+    
+
   </lui-dialog-body>
   <lui-dialog-footer>
     <button class="lui-button  lui-dialog__footer-button" ng-click="close();">Close</button>

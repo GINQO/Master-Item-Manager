@@ -1,82 +1,55 @@
 <style>
-.content-center {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-}
-.masteritembutton{
-	width: 340px
-}
-.masteritemdelete{
-	width:170px
-}
-.masteritemdeleteall{
-	width:100px
-}
-.instructions{
-	width:250px
-}
-
+	.content-center {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		-webkit-transform: translate(-50%, -50%);
+		transform: translate(-50%, -50%);
+		font-size: 12px;
+	}
 </style>
 <div qv-extension>
-	
-	
+
+
 	<!-- Create Instructions and Title -->
 	<div class="content-center">
+
 		
 
 		<div style="text-align: center">
-			<div class="lui-buttongroup">
-				<button title="Help" style="left: 0%" ng-click="openDialog()" class="lui-button  lui-button--default">
-						<span class="lui-fade-button__icon lui-icon lui-icon--help"></span>
-				</button>
-				<button title="Partial Reload" style="left: 0%" ng-click="PartialReload()" class="lui-button  lui-button--default">
-						<span class="lui-fade-button__icon lui-icon lui-icon--reload"></span>
-				</button>
-				<button title="Master Item Overview" style="left: 0%" ng-click="openDialog2()" class="lui-button  lui-button--default">
-						<span class="lui-fade-button__icon lui-icon lui-icon--table"></span>
-				</button>
-				<button title="Export Measure Items" style="left: 0%" ng-click="ExportMeasures()" class="lui-button  lui-button--default">
-						<span class="lui-fade-button__icon lui-icon lui-icon--measure"></span>
-				</button>
-				<button title="Export Dimension Items" style="left: 0%" ng-click="ExportDimensions()" class="lui-button  lui-button--default">
-					<span class="lui-fade-button__icon lui-icon lui-icon--book"></span>
-			</button>
-			<!-- <button title="Export Variables" style="left: 0%" ng-click="ExportVariables()" class="lui-button  lui-button--default">
-					<span class="lui-fade-button__icon lui-icon lui-icon--variables"></span>
-			</button> -->
-			<button title="Purge Master Items" ng-click="DestroyAllMeasures();" style="left: 0%" class="lui-button lui-button--danger">
-					<span class="lui-fade-button__icon lui-icon lui-icon--disconnect"></span>
-			</button>
-			</div>
-			<br><br><br>
-			<h1><span class="lui-icon  lui-icon--cogwheel" aria-hidden="true"></span>  Manage Master Items</h1>
+			<h1>GINQO Master Item Manager <img src="http://static1.squarespace.com/static/57e6f5d9d482e9a8f58af132/t/57e70458893fc04435852460/1474757722592/ginqo_1000px.png?format=1500w" style="width:30px"></h1>
 			<br>
-			<div class="lui-buttongroup">
-					<button ng-click="openDialogDim()" class="masteritemdelete lui-button">
-							<span class="lui-button__icon  lui-icon  lui-icon--menu"></span><span class="lui-button__text">Dimensions</span><span class="lui-button__caret  lui-caret"></span>
-					</button>
-					<button ng-click="openDialogMeas()" class="masteritemdelete lui-button">
-							<span class="lui-button__icon  lui-icon  lui-icon--menu"></span><span class="lui-button__text">Measures</span><span class="lui-button__caret  lui-caret"></span>
-					</button>
 
-			</div>
-	<!-- <button class="instructions lui-button" ng-click="openDialog()">Instructions: </button> -->
-	
+			<ul class="lui-tabset lui-tabset--fill" style="border-top: 1px solid rgba(0, 0, 0, 0.1); border-bottom: 1px solid rgba(0, 0, 0, 0.1);">
+				<li ng-click="openDialogDim()" class="lui-tab" title="Dimensions">
+					<span class="lui-button__icon  lui-icon  lui-icon--book"></span>
+				</li>
+				<li ng-click="openDialogMeas()" class="lui-tab" title="Measures">
+					<span class="lui-button__icon  lui-icon  lui-icon--measure"></span>
+				</li>
+			</ul>
+			<!-- <button class="instructions lui-button" ng-click="openDialog()">Instructions: </button> -->
+
 		</div>
-	<br>
-	<span><a href="https://ginqo.com" target="_blank">GINQO</a> Master Item Manager (Dec 2018, Build 1.0)</span>
-		
+		<br>
+		<span><a href="https://ginqo.com" target="_blank">GINQO</a> Master Item Manager (January 2018, Build 1.0)</span>
+
 	</div>
-	
 </div>
 
 
 <!--
 	<button class="masteritemdelete lui-button lui-button--large" ng-click="openDialogDim()">Dimensions <span class="lui-fade-button__icon lui-icon lui-icon--menu"></span></button>
 	<button class="masteritemdelete lui-button lui-button--large" ng-click="openDialogMeas()">Measures <span class="lui-fade-button__icon lui-icon lui-icon--menu"></span></button>
+-->
 
 
+<!--
+	Master Item Overview and Export Variables
+	<button title="Master Item Overview" style="left: 0%" ng-click="openDialog2()" class="extras lui-button  lui-button--default">
+		<span class="lui-fade-button__icon lui-icon lui-icon--table"></span>
+	</button> 
+	<button title="Export Variables" style="left: 0%" ng-click="ExportVariables()" class="extras lui-button  lui-button--default">
+		<span class="lui-fade-button__icon lui-icon lui-icon--variables"></span>
+	</button>
 -->
