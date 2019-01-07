@@ -300,7 +300,8 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 										results.then(reply => {								
 											
 											const testArray = reply.map(element => {
-												const response = element.getLayout();
+											//	const response = element.getLayout(); (1/7/2019: Wrong method to get definition of formula. Should use getProperties() instead)
+												const response = element.getProperties();
 												return response;
 											})
 											const itemsNotFormatted = Promise.all(testArray);
@@ -355,9 +356,9 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 															Field: `"${item.qDim.qFieldDefs[0]}"`, // remove commas to avoid errors,
 															Name: `"${item.qDim.title}"`,
 															LabelExpression: `"${item.qDim.qLabelExpression}"`.replace("undefined", ""),
-															Description: `"${item.qMeta.description}"`,
+															Description: `"${item.qMetaDef.description}"`,
 															Color: `"${item.qDim.coloring.baseColor.color}"`,
-															Tags: `"${item.qMeta.tags[0]}"`.replace("undefined", ""),
+															Tags: `"${item.qMetaDef.tags[0]}"`.replace("undefined", ""),
 															ID: `"${item.qInfo.qId}"`
 															
 												//.replace(/(\u005Ct)/g, '\t').replace(/(\u005Cr\u005Cn)/g, '\n')
@@ -741,7 +742,7 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 											//console.log(results)
 											const testArray = reply.map(element => {
 												// const response = element.getLayout();
-												const response = element.getLayout();
+												const response = element.getProperties();
 												return response;
 											})
 											const itemsNotFormatted = Promise.all(testArray);
@@ -786,16 +787,18 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 															break;
 														}
 														
+														
 													})
 													
 													item.map(item => {
+														console.log(item);
 														itemsFormatted.push({
-															Expression: `"${item.qMeasure.qDef}"`,
+															Expression: `"${item.qMeasure.qDef}"`.replace("undefined", ""),
 															Name: `"${item.qMeasure.qLabel}"`,
 															LabelExpression: `"${item.qMeasure.qLabelExpression}"`.replace("undefined", ""),
-															Description: `"${item.qMeta.description}"`,
+															Description: `"${item.qMetaDef.description}"`,
 															Color:`"${item.qMeasure.coloring.baseColor.color}"`,
-															Tags:`"${item.qMeta.tags[0]}"`.replace("undefined", ""),
+															Tags:`"${item.qMetaDef.tags[0]}"`.replace("undefined", ""),
 															ID: `"${item.qInfo.qId}"`,
 														});
 													})
