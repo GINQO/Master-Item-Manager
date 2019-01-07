@@ -35,7 +35,7 @@ GINQO Development
 # Change Log
 
 # Known Issues and Limitations
-> None
+> Exporting of Master Items will sometimes add an additional single quote to the end of a complex expression. Just be cautious when copying back to your template spreadsheet
 
 # Licence
 
