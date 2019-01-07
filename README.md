@@ -12,13 +12,6 @@
 Qlik Sense Enterprise >= 3.0 
 (Desktop not supported)
 
-
-# Installing
-1. Import this extension as a zip file into the QMC
-2. Using the provided xlsx file, update the master items as you need (Don't rename the headers)
-3. Using the load script, import the xlsx file.
-4. Click the import button to update your master items!
-
 # Usage
 1. From the Load Editor, create a Data Connection to the template excel file (provided in zip)
 2. Import the Dimensions and Measures table into your script, adding REPLACE LOADs if you want to enable partial reload
