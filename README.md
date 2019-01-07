@@ -45,5 +45,5 @@ GINQO Development
 
 # Licence
 
-### Copyright (C) 2018 GINQO Consulting Ltd. - All Rights Reserved
+### Copyright (C) 2019 GINQO Consulting Ltd. - All Rights Reserved
 
