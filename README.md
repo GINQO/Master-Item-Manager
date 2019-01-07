@@ -1,11 +1,12 @@
 # GINQO MasterItemManager™
 
-![](demo.gif)
 
 # Getting Started
 1. Download this extension on a zip file using the 'Clone or Download' button
 2. Using the QMC import the zip file as an extension
 3. You can now drag and drop the extension into your Qlik Sense application
+
+![](demo.gif)
 
 # Prerequisites
 Qlik Sense Enterprise >= 3.0 
