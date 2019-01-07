@@ -545,8 +545,8 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 														
 															var labelExpression = row.cells[2].qText;
 															var description = row.cells[3].qText;
-															var color = row.cells[4].qText;
-															var tags = row.cells[5].qText
+															var color = row.cells[5].qText;
+															var tags = row.cells[4].qText
 															if(labelExpression === '-'){
 																labelExpression = '';
 															}
@@ -606,8 +606,8 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 									enigma.app.getMeasure(row.cells[6].qText).then(reply =>{
 										var labelExpression = row.cells[2].qText;
 										var description = row.cells[3].qText;
-										var color = row.cells[4].qText;
-										var tags = row.cells[5].qText
+										var color = row.cells[5].qText;
+										var tags = row.cells[4].qText
 										if(labelExpression === '-'){
 											labelExpression = '';
 										}
