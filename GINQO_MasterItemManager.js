@@ -138,6 +138,22 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 			
 														if (!arrayDimensions.includes(row.cells[6].qText)) {
 															
+															var labelExpression = row.cells[2].qText;
+															var description = row.cells[3].qText;
+															var color = row.cells[4].qText;
+															var tags = row.cells[5].qText
+															if(labelExpression === '-'){
+																labelExpression = '';
+															}
+															if(description === '-'){
+																description = '';
+															}
+															if(color === '-'){
+																color = '';
+															}
+															if(tags === '-'){
+																tags ='';
+															}
 															enigma.app.createDimension({
 																"qInfo": {
 																	"qType": "dimension",
@@ -146,7 +162,7 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 																"qDim": {
 																	//	"title": "something",
 																	"qGrouping": "N",
-																	"qLabelExpression": `${row.cells[2].qText}`,
+																	"qLabelExpression": labelExpression,
 																	"qFieldDefs": [
 																		row.cells[1].qText //Dimension Field:
 																	],
@@ -154,15 +170,15 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 																	"title": row.cells[0].qText,
 																	"coloring": {
 																		"baseColor": {
-																			"color": row.cells[4].qText, // Dimension Color:
+																			"color": color, // Dimension Color:
 																			"index": -1
 																		},
 																	},
 																},
 																"qMetaDef": {
 																	"title": row.cells[0].qText, //Dimension Name
-																	"description": row.cells[3].qText, //Desciption:
-																	"tags": [row.cells[5].qText], //Tags
+																	"description": description, //Desciption:
+																	"tags": [tags], //Tags
 																}
 															});
 														} else {
@@ -185,7 +201,25 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 							}
 							$scope.UpdateDimension = function() {
 								// For each element that exists in MIM Definition => Do something
+								
+								
 								dimensionvalues.rows.forEach(row => {
+									var labelExpression = row.cells[2].qText;
+									var description = row.cells[3].qText;
+									var color = row.cells[4].qText;
+									var tags = row.cells[5].qText
+									if(labelExpression === '-'){
+										labelExpression = '';
+									}
+									if(description === '-'){
+										description = '';
+									}
+									if(color === '-'){
+										color = '';
+									}
+									if(tags === '-'){
+										tags ='';
+									}
 									enigma.app.getDimension(row.cells[6].qText).then(reply =>{
 										reply.setProperties({
 											"qInfo": {
@@ -195,7 +229,7 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 											"qDim": {
 												//	"title": "something",
 												"qGrouping": "N",
-												"qLabelExpression": `${row.cells[2].qText}`,
+												"qLabelExpression": labelExpression,
 												"qFieldDefs": [
 													row.cells[1].qText //Dimension Field:
 												],
@@ -203,15 +237,15 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 												"title": row.cells[0].qText,
 												"coloring": {
 													"baseColor": {
-														"color": row.cells[4].qText, // Dimension Color:
+														"color": color, // Dimension Color:
 														"index": -1
 													},
 												},
 											},
 											"qMetaDef": {
 												"title": row.cells[0].qText, //Dimension Name
-												"description": row.cells[3].qText, //Desciption:
-												"tags": [row.cells[5].qText], //Tags
+												"description": description, //Desciption:
+												"tags": [tags], //Tags
 											}
 										}).then(reply => {
 											swal({
@@ -290,7 +324,7 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 												itemsNotFormatted.then((item) => {
 													//console.log(item);
 													item.map(item => {
-													
+													console.log(item)
 														switch(item.qDim.coloring){
 															case undefined: 
 																item.qDim.coloring = {
@@ -311,6 +345,7 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 																};
 															break;
 														}
+														
 														//console.log(item.qDim.coloring)
 														//console.log(item.qDim.coloring.baseColor)
 													})
@@ -507,6 +542,22 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 														// If there exists a measureid already, don't create
 														if (!arrayMeasures.includes(row.cells[6].qText)) {
 														
+															var labelExpression = row.cells[2].qText;
+															var description = row.cells[3].qText;
+															var color = row.cells[4].qText;
+															var tags = row.cells[5].qText
+															if(labelExpression === '-'){
+																labelExpression = '';
+															}
+															if(description === '-'){
+																description = '';
+															}
+															if(color === '-'){
+																color = '';
+															}
+															if(tags === '-'){
+																tags ='';
+															}
 															enigma.app.createMeasure({
 																"qInfo": {
 																	"qType": "measure",
@@ -516,11 +567,11 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 																	"qLabel": row.cells[0].qText,
 																	"qDef": row.cells[3].qText,
 																	"qGrouping": "N",
-																	"qLabelExpression": `${row.cells[2].qText}`, // wrap this string in ='' so Qlik understands it as an expression
+																	"qLabelExpression": labelExpression, // wrap this string in ='' so Qlik understands it as an expression
 																	"qExpressions": [],
 																	"coloring": {
 																		"baseColor": {
-																			"color": row.cells[5].qText,
+																			"color": color,
 																			"index": -1
 																		},
 																	},
@@ -528,8 +579,8 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 																},
 																"qMetaDef": {
 																	"title": row.cells[0].qText,
-																	"description": `${row.cells[1].qText}`, // Description:
-																	"tags": [row.cells[4].qText], //Tags:
+																	"description": description, // Description:
+																	"tags": [tags], //Tags:
 																}
 															});
 														} else {
@@ -552,6 +603,22 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 								// For each element that exists in MIM Definition => Do something
 								measurevalues.rows.forEach(row => {
 									enigma.app.getMeasure(row.cells[6].qText).then(reply =>{
+										var labelExpression = row.cells[2].qText;
+										var description = row.cells[3].qText;
+										var color = row.cells[4].qText;
+										var tags = row.cells[5].qText
+										if(labelExpression === '-'){
+											labelExpression = '';
+										}
+										if(description === '-'){
+											description = '';
+										}
+										if(color === '-'){
+											color = '';
+										}
+										if(tags === '-'){
+											tags ='';
+										}
 										reply.setProperties({
 											"qInfo": {
 												"qType": "measure",
@@ -561,11 +628,11 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 												"qLabel": row.cells[0].qText,
 												"qDef": row.cells[3].qText,
 												"qGrouping": "N",
-												"qLabelExpression": `${row.cells[2].qText}`,
+												"qLabelExpression": labelExpression,
 												"qExpressions": [],
 												"coloring": {
 													"baseColor": {
-														"color": row.cells[5].qText,
+														"color": color,
 														"index": -1
 													},
 												},
@@ -573,8 +640,8 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 											},
 											"qMetaDef": {
 												"title": row.cells[0].qText,
-												"description": `${row.cells[1].qText}`, // Description:
-												"tags": [row.cells[4].qText], //Tags:
+												"description": description, // Description:
+												"tags": [tags], //Tags:
 											}
 										}).then(reply => {
 											swal({
@@ -673,6 +740,7 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 										results.then(reply => {								
 											//console.log(results)
 											const testArray = reply.map(element => {
+												// const response = element.getLayout();
 												const response = element.getLayout();
 												return response;
 											})
@@ -696,6 +764,7 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 												// format the data
 												itemsNotFormatted.then((item) => {
 													item.map(item => {
+														console.log(item);
 														switch(item.qMeasure.coloring){
 															case undefined: 
 																item.qMeasure.coloring = {
@@ -716,6 +785,7 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 															}
 															break;
 														}
+														
 													})
 													
 													item.map(item => {
