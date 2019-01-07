@@ -378,7 +378,7 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 													  var fileTitle = 'DimensionExport';
 													  exportCSVFile(headers, itemsFormatted, fileTitle);
 													  swal({
-														text:"Measure Dimension Items Exported.", 
+														text:"Dimension Master Items Exported.", 
 														icon: "success",
 													});
 												});
