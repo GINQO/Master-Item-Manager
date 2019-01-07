@@ -7,7 +7,8 @@
 3. You can now drag and drop the extension into your Qlik Sense application
 
 # Prerequisites
-Qlik Sense >= 3.0
+Qlik Sense Enterprise >= 3.0 
+(Desktop not supported)
 
 # Installing
 1. Import this extension as a zip file into the QMC
