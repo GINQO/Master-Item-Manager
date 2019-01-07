@@ -1,5 +1,6 @@
 # GINQO MasterItemManager™
 
+![](demo.gif)
 
 # Getting Started
 1. Download this extension on a zip file using the 'Clone or Download' button
