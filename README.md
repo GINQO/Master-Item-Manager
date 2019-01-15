@@ -20,9 +20,11 @@ Qlik Sense Enterprise >= 3.0
 5. You can now use the Actions on the Master Items to create your Master Items from the template file.
 
 # The Template file
-It is important that when using the template file that you
-1. Always include mandatory fields
-2. 
+1. Must have unique ID's for Dimensions and Measures
+2. It is recommended that calculated expressions (usually label expressions) are wrapped in quotes: EG: '='Sum(Dim1)'
+3. It is recommended that text based expressions (usually label expressions) are wrapped in quotes: ''Label Expression Example'
+4. Measures require: Expression, Name
+5. Dimensions require: Field, Name
 
 # Actions	
 1. Actions (Eg: Create, Update, Delete) will only affect Master Items that are shown in the Dimensions and Measures tables.	
