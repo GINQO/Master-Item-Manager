@@ -519,7 +519,7 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 								var arrayMeasures = [];
 								var arrayDimensions = [];
 						
-			
+							
 											enigma.app.createSessionObject({
 												qMeasureListDef: {
 													qType: 'measure',
@@ -541,10 +541,11 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 												}).then(() => {
 													measurevalues.rows.forEach(function (row, rowno) {
 														// If there exists a measureid already, don't create
+
 														if (!arrayMeasures.includes(row.cells[6].qText)) {
 														
 															var labelExpression = row.cells[2].qText;
-															var description = row.cells[3].qText;
+															var description = row.cells[1].qText;
 															var color = row.cells[5].qText;
 															var tags = row.cells[4].qText
 															if(labelExpression === '-'){
