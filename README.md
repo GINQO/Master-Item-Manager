@@ -19,6 +19,11 @@ Qlik Sense Enterprise >= 3.0
 4. Only items filtered in the table will be affected by actions from the Master Item Manager
 5. You can now use the Actions on the Master Items to create your Master Items from the template file.
 
+# The Template file
+It is important that when using the template file that you
+1. Always include mandatory fields
+2. 
+
 # Actions	
 1. Actions (Eg: Create, Update, Delete) will only affect Master Items that are shown in the Dimensions and Measures tables.	
 2. Selecting values from the tables will allow actions to be performed only on those selected.	
