@@ -14,7 +14,7 @@ Qlik Sense Enterprise >= 3.0
 
 # Usage
 1. From the Load Editor, create a Data Connection to the template excel file (provided in zip)
-2. Import the Dimensions and Measures table into your script, adding REPLACE LOADs if you want to enable partial reload
+2. Import the Dimensions and Measures table into your script (adding REPLACE LOADs if you want to enable partial reload)
 3. In your Qlik Sense Application, create one table for the template Dimensions and another for template Measures (Highly recommend qsQuickTableViewer from ChristofSchwarz and Ralf Becher for this https://github.com/ChristofSchwarz/qsQuickTableViewer)
 4. Only items filtered in the table will be affected by actions from the Master Item Manager
 5. You can now use the Actions on the Master Items to create your Master Items from the template file.
@@ -37,7 +37,7 @@ Qlik Sense Enterprise >= 3.0
 6. Export Measures/Dimensions: This will export Master Items based on the template file scheme, making it easy to copy over manually created Master Items from applications.
 
 # Authors
-GINQO Development
+GINQO
 
 # Change Log
 
