@@ -1,5 +1,9 @@
 # GINQO MasterItemManager™
 
+# Features
+1. Import Master Items (through template file)
+2. Export Master Items from old projects (you can copy them back into template file to reuse in other projects)
+3. Partial reload (to avoid reload times on large data sets if template file changes)
 
 # Getting Started
 1. Download this extension on a zip file using the 'Clone or Download' button
