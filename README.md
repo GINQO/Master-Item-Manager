@@ -1,9 +1,5 @@
 # GINQO MasterItemManager
-
-# Features
-1. Import Master Items (through template file)
-2. Export Master Items from old projects (you can copy them back into template file to reuse in other projects)
-3. Partial reload (to avoid reload times on large data sets if template file changes)
+Our intention was to create an application that would help with efficiency with development, especially around Master Items. Since Master Items are frequently reused across applications, we felt a governed approach would fit best. Using our template file, Master Items can be saved for later creation. Master Items can be selected using a Qlik table then updated or deleted using this application. Finally, by default, the MasterItemManager won't affect your manually created Master Items unless specifically requested, making it a safe tool to use with in conjunction with previously defined apps.
 
 # Getting Started
 1. Download this extension on a zip file using the 'Clone or Download' button
