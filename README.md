@@ -1,4 +1,4 @@
-# GINQO MasterItemManager™
+# GINQO MasterItemManager
 
 # Features
 1. Import Master Items (through template file)
@@ -47,8 +47,3 @@ GINQO
 
 # Known Issues and Limitations
 > Exporting of Master Items will sometimes add an additional single quote to the end of a complex expression. Just be cautious when copying back to your template spreadsheet
-
-# Licence
-
-### Copyright (C) 2019 GINQO Consulting Ltd. - All Rights Reserved
-
