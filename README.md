@@ -1,18 +1,18 @@
 # GINQO MasterItemManager
 Our intention was to create an application that would help with efficiency with development, especially around Master Items. Since Master Items are frequently reused across applications, we felt a governed approach would fit best. Using our template file, Master Items can be saved for later creation. Master Items can be selected using a Qlik table then updated or deleted using this application. Finally, by default, the MasterItemManager won't affect your manually created Master Items unless specifically requested, making it a safe tool to use with in conjunction with previously defined apps.
 
-# Installation
-1. Download this extension on a zip file using the 'Clone or Download' button
-2. Access navigate to 'Extensions' under the QMC (Qlik Management Console)
-3. Import the zip file
-
 ![](demo.gif)
 
 # Prerequisites
 Qlik Sense Enterprise >= 3.0 
 (Desktop not supported)
 
-# Usage
+# Installation
+1. Download this extension on a zip file using the 'Clone or Download' button
+2. Access navigate to 'Extensions' under the QMC (Qlik Management Console)
+3. Import the zip file
+
+# Getting Started
 1. Navigate to the Data Load Editor
 2. Create a Data Connection to the template excel file (it is provided in the zip file)
 3. Insert the scripts for your Dimensions and Measures tables (add REPLACE LOADs if you want to enable partial reload)
