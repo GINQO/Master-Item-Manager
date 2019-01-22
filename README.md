@@ -40,4 +40,4 @@ GINQO
 # Change Log
 
 # Known Issues and Limitations
-> Exporting of Master Items will sometimes add an additional single quote to the end of a complex expression. Just make sure to remove it when copying back to your template spreadsheet
+> Exporting of Master Items will sometimes add an additional single quote to the end of a complex expression. Just make sure to remove it when copying back to your template spreadsheet.
