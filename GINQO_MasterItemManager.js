@@ -1,5 +1,5 @@
-define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.html', 'text!./dialog-template2.ng.html', 'text!./dialog-template3.ng.html', 'text!./dialog-template4.ng.html', './lib/swal'],
-	function ($, qlik, template, dialogTemplate, dialogTemplate2, dialogTemplate3, dialogTemplate4) {
+define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.html', 'text!./dialog-template2.ng.html', 'text!./dialog-template3.ng.html', 'text!./dialog-template4.ng.html', './lib/swal', './lib/lodash'],
+	function ($, qlik, template, dialogTemplate, dialogTemplate2, dialogTemplate3, dialogTemplate4, __) {
 		'use strict';
 	
 		
@@ -31,7 +31,10 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 				const enigma = $scope.component.model.enigmaModel;
 				var app = qlik.currApp(this);
 				$scope.title = "GINQO Governed Metric Button";
-
+				enigma.app.global.engineVersion().then(reply => {
+					console.log(reply);
+				});
+			
 				$scope.openDialog = function () {
 					luiDialog.show({
 						template: dialogTemplate,
@@ -113,92 +116,152 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 							$scope.CreateDimension = function () {
 								var arrayMeasures = [];
 								var arrayDimensions = [];
-										
-											enigma.app.createSessionObject({
-												qDimensionListDef: {
-													qType: 'dimension',
-													qData: {
-														info: '/qDimInfos',
-														dimension: '/qDim'
-													},
-													qMeta: {}
-												},
-												qInfo: {
-													qId: "DimensionList",
-													qType: "DimensionList"
-												}
-											}).then((list) => {
-												list.getLayout().then((layout) => {
-													layout.qDimensionList.qItems.forEach((element) => {
-														//console.log(element.qInfo.qId);
-														arrayDimensions.push(element.qInfo.qId);
+								// Check engine version for most recent schema. If not most recent use new schema.
+								enigma.app.global.engineVersion().then(reply => {
+									// If matches February 2019
+									if(reply.qComponentVersion === "12.287.2"){
+										console.log("You are running February 2019")
+									}
+									enigma.app.createSessionObject({
+										qDimensionListDef: {
+											qType: 'dimension',
+											qData: {
+												info: '/qDimInfos',
+												dimension: '/qDim'
+											},
+											qMeta: {}
+										},
+										qInfo: {
+											qId: "DimensionList",
+											qType: "DimensionList"
+										}
+									}).then((list) => {
+										list.getLayout().then((layout) => {
+											layout.qDimensionList.qItems.forEach((element) => {
+												//console.log(element.qInfo.qId);
+												arrayDimensions.push(element.qInfo.qId);
+											})
+										}).then(() => {
+											dimensionvalues.rows.forEach(function (row, rowno) {
+	
+												if (!arrayDimensions.includes(row.cells[6].qText)) {
+													
+													
+													console.log(row);
+													var dimensionfields = row.cells[1].qText.split(",").map(item => {
+														return item.trim();
 													})
-												}).then(() => {
-													dimensionvalues.rows.forEach(function (row, rowno) {
-			
-														if (!arrayDimensions.includes(row.cells[6].qText)) {
-															
-															var labelExpression = row.cells[2].qText;
-															var description = row.cells[3].qText;
-															var color = row.cells[4].qText;
-															var tags = row.cells[5].qText
-															if(labelExpression === '-'){
-																labelExpression = '';
-															}
-															if(description === '-'){
-																description = '';
-															}
-															if(color === '-'){
-																color = '';
-															}
-															if(tags === '-'){
-																tags ='';
-															}
-															enigma.app.createDimension({
-																"qInfo": {
-																	"qType": "dimension",
-																	"qId": row.cells[6].qText
-																},
-																"qDim": {
-																	//	"title": "something",
-																	"qGrouping": "N",
-																	"qLabelExpression": labelExpression,
-																	"qFieldDefs": [
-																		row.cells[1].qText //Dimension Field:
-																	],
-																	//"qFieldLabels": ["TEST"],
-																	"title": row.cells[0].qText,
-																	"coloring": {
-																		"baseColor": {
-																			"color": color, // Dimension Color:
-																			"index": -1
-																		},
-																	},
-																},
-																"qMetaDef": {
-																	"title": row.cells[0].qText, //Dimension Name
-																	"description": description, //Desciption:
-																	"tags": [tags], //Tags
-																}
-															});
-														} else {
-															//swal("Duplicates found. Some dimensions may not have been imported.")
-														}
+													var labelExpression = row.cells[2].qText;
+													var description = row.cells[3].qText;
+													var color = row.cells[4].qText;
+													var tags = row.cells[5].qText.split(",").map(item => { 
+														return item.trim(); // Return item with no whitespace
 													});
-												
-											});
+													var qGrouping;
+													if(dimensionfields.length > 1) {
+														qGrouping = "H"
+													}else{
+														qGrouping = "N"
+													};
+													if(labelExpression === '-'){
+														labelExpression = '';
+													}
+													if(description === '-'){
+														description = '';
+													}
+													if(color === '-'){
+														color = '';
+													}
+													if(tags === '-'){
+														tags ='';
+													}
 
-											swal({
-												text:"Dimensions Created.", 
-												icon: "success",
+													var dimensionSchema = {
+														"qInfo": {
+															"qType": "dimension",
+															"qId": row.cells[6].qText
+														},
+														"qDim": {
+															//	"title": "something",
+															"qGrouping": qGrouping,
+															"qLabelExpression": labelExpression,
+															"qFieldDefs": dimensionfields,
+															//"qFieldLabels": ["TEST"],
+															"title": row.cells[0].qText,
+															"coloring": {
+																"baseColor": {
+																	"color": color, // Dimension Color:
+																	"index": -1
+																},
+															},
+														},
+														"qMetaDef": {
+															"title": row.cells[0].qText, //Dimension Name
+															"description": description, //Desciption:
+															"tags": tags, //Tags
+														}
+													};
+
+													// var dimensionSchema = {	
+													// 	"qInfo": {
+													// 	"qType": "dimension",
+													// 	"qId": "RXbFx"
+													// 	},
+													// 	"qDim": {
+													// 	"qGrouping": "N",
+													// 	"qFieldDefs": [
+													// 		"Dim1"
+													// 	],
+													// 	"title": "Dim1 (v2.0)",
+													// 	"qLabelExpression": "'Master Item Description'",
+													// 	"coloring": {
+													// 		"changeHash": "350", //what is this? 0.6938409057174357
+													// 		"baseColor": {
+													// 			"color": "#232145",
+													// 			"index": -1 // set index to -1 to allow custom color value
+													// 		}
+													// 	},
+													// 	"qFieldLabels": [
+													// 		"asddsa"
+													// 	]
+													// 	},
+													// 	"qMetaDef": {
+													// 	"title": "Dim1",
+													// 	"description": "This is a description of a Master Item dimension in February 2019",
+													// 	"tags": [
+													// 		"tag1",
+													// 		"tag2",
+													// 		"tag3"
+													// 	]
+													// 	}  
+													// }
+														  
+													
+
+
+													enigma.app.createDimension(dimensionSchema);
+												} else {
+													//swal("Duplicates found. Some dimensions may not have been imported.")
+												}
 											});
 										
 									});
+	
+									swal({
+										text:"Dimensions Created.", 
+										icon: "success",
+									});
+								
+									});
+								})
+
+								
 			
 			
 			
 			
 							}
+
 							$scope.UpdateDimension = function() {
 								// For each element that exists in MIM Definition => Do something
 								
@@ -256,6 +319,7 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 									})
 								});
 							};
+							
 							$scope.DestroyDimension = function () {
 								// The Engine API DestroyMeasure function: https://help.qlik.com/en-US/sense-developer/September2018/APIs/EngineAPI/services-Doc-DestroyMeasure.html
 								//console.log("Test")
@@ -1159,7 +1223,6 @@ define(['jquery', 'qlik', 'text!./template.ng.html', 'text!./dialog-template.ng.
 
 				$scope.DestroyDimension = function () {
 					// The Engine API DestroyMeasure function: https://help.qlik.com/en-US/sense-developer/September2018/APIs/EngineAPI/services-Doc-DestroyMeasure.html
-					//console.log("Test")
 
 					dimensionvalues.rows.forEach(element => {
 						enigma.app.destroyDimension(element.cells[6].qText)

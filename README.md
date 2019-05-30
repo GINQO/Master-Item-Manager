@@ -1,5 +1,5 @@
 # GINQO MasterItemManager
-Our intention was to create an application that would help with efficiency with development, specifically around Master Items. Since Master Items are frequently reused across applications, we felt a governed approach would fit best. Using our template file, Master Items can be saved for later creation. Master Items can be selected using a Qlik table then updated or deleted using this application. Finally, by default, the MasterItemManager won't affect your manually created Master Items unless specifically requested, making it a safe tool to use with in conjunction with previously defined apps.
+Our intention was to create an application that would help with efficiency with development, especially around Master Items. Since Master Items are frequently reused across applications, we felt a governed approach would fit best. Using our template file, Master Items can be saved for later creation. Master Items can be selected using a Qlik table then updated or deleted using this application. Finally, by default, the MasterItemManager won't affect your manually created Master Items unless specifically requested, making it a safe tool to use with in conjunction with previously defined apps.
 
 ![](demo.gif)
 
@@ -40,4 +40,4 @@ GINQO
 # Change Log
 
 # Known Issues and Limitations
-> Exporting of Master Items will sometimes add an additional single quote to the end of a complex expression. Just make sure to remove it when copying back to your template spreadsheet.
+> Exporting of Master Items will sometimes add an additional single quote to the end of a complex expression. Just make sure to remove it when copying back to your template spreadsheet
