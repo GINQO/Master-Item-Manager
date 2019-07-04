@@ -16,8 +16,8 @@ Qlik Sense Enterprise >= 3.0
 1. Navigate to the Data Load Editor
 2. Create a Data Connection to the template excel file (it is provided in the zip file)
 3. Insert the scripts for your Dimensions and Measures tables (add REPLACE LOADs if you want to enable partial reload)
-4. Back in your Qlik Sense Application, create one table for the template file's Dimensions and another for template file's Measures (Highly recommend [Quick Table Viewer](https://github.com/ChristofSchwarz/qsQuickTableViewer) from ChristofSchwarz and Ralf Becher for this)
-5. You can now use the [Actions](#-Actions) on the Master Items to create your Master Items from the template file.
+4. Back in your Qlik Sense Application, create one table for the template file's Dimensions and another for template file's Measures (Highly recommend [Quick Table Viewer](https://developer.qlik.com/garden/5bd1f3373e4dd400115204b0) from ChristofSchwarz and Ralf Becher for this)
+5. You can now use the [Actions](#actions) on the Master Items to create your Master Items from the template file.
 
 # Using the Template file
 1. Dimensions and Measures must have unique ID's
