@@ -1,0 +1,75 @@
+<lui-dialog style="max-width: 1200px;">
+  <lui-dialog-header>
+    <lui-dialog-title>Confirm Selected Dimensions</lui-dialog-title>
+  </lui-dialog-header>
+  <lui-dialog-body>
+
+    <button type="button" class="lui-fade-button" ng-click="selState.clearAll()" aria-label="Clear">
+        Clear Selections <span class="lui-icon lui-icon--remove" aria-hidden="true"></span>
+    </button><br>
+
+
+    <ul style="height:200px" class="lui-list assets-n-minutes__list ng-scope">
+      <h1 style="font-size:10px">**The following dimensions will be affected**</h1>
+      <table style="width:250px">
+        <tr>
+          <th>
+              <li class="lui-list__header">
+                <span class="lui-list__text">Dimension Name</span>
+              </li>
+              <li ng-repeat="row in dimensionvalues.qHyperCube.qDataPages[0].qMatrix" class="lui-list__item" >
+                <span style="font-weight:300;" class="lui-list__text popover" ng-click="openPopover($index, row)">
+                  <div style="font-size:12px; color:#595959">{{row[0].qText}}</div>
+                  <div style="font-size:11px; color:#A6A6A6">{{row[2].qText}}</div>
+                </span>
+              </li>
+          </th>
+          <!--
+
+          -->
+        </tr>
+
+      </table>
+</ul>
+
+
+
+</lui-dialog-body>
+<lui-dialog-footer>
+  <button class="lui-button  lui-dialog__footer-button" ng-click="close();">Close</button>
+  <button class="lui-button lui-button--success  lui-dialog__footer-button" ng-click="createdimension();">Accept</button>
+</lui-dialog-footer>
+</lui-dialog>
+<!--
+
+
+
+<button type="button" class="btn btn-default btn-xs" ng-click="field.rows[0].select()" aria-label="Lock">
+  <span class="lui-icon lui-icon--remove" aria-hidden="true"></span>
+</button>
+-->
+
+
+
+<!--
+    <table>
+      <tr class="header">
+        <th>Measure Name</th>
+        <th>Measure Description</th>
+        <th>Measure Label Expression</th>
+        <th>Measure Expression</th>
+        <th>Measure Tags</th>
+        <th>Measure Color</th>
+        <th>Measure Id</th>
+      </tr>
+      <tr ng-repeat="row in measurevalues.qHyperCube.qDataPages[0].qMatrix">
+        <td class="data" ng-repeat="col in row">
+          {{col.qText}}
+        </td>
+      </tr>
+    </table>
+<!-->
+
+
+
+<!-- <li>Import your metrics using <a href="https://ginqo.box.com/s/altga7hukg16bnzqb7tn1k7i7biqd0jf" target="_blank">this template</a> or the provided excel file</li> -->

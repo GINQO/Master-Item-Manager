@@ -1,0 +1,52 @@
+<style>
+
+  th,
+  td,
+  table,
+  tr {
+    color: inherit;
+    vertical-align: top;
+    border: 1px solid #f2f2f2;
+    background-color: inherit;
+    padding-top: .23076923em;
+    padding-bottom: .23076923em;
+  }
+
+  tr,
+  td,
+  th {
+    width: 200px;
+  }
+</style>
+
+<lui-dialog style="max-width: 1200px;">
+  <lui-dialog-header>
+    <lui-dialog-title>Dimension Functions</lui-dialog-title>
+  </lui-dialog-header>
+  <lui-dialog-body>
+
+      <div class="lui-popover__body lui-nopad">
+        <ul class="lui-list">
+          <li ng-click="CreateDimension();" class="lui-list__item">
+            <span class="lui-list__text lui-list__action">Syncronize</span>
+          </li>
+          <li ng-click="DestroyDimension();" class="lui-list__item">
+            <span class="lui-list__text lui-list__action">Delete</span>
+          </li>
+        </ul>
+      </div>
+      <div class="lui-popover__footer lui-nopad" style="display: flex; justify-content: space-around;">
+
+        <button title="Delete all Dimension Items" ng-click="DestroyAllMeasures();" class="lui-fade-button  lui-fade-button--large">
+          <span class="lui-fade-button__icon  lui-icon  lui-icon--bin"></span>
+        </button>
+        <button title="Download Dimension Schemas" ng-click="ExportDimensions()" class="lui-fade-button  lui-fade-button--large">
+          <span class="lui-fade-button__icon lui-icon lui-icon--download"></span>
+        </button>
+      </div>
+
+  </lui-dialog-body>
+  <lui-dialog-footer>
+    <button class="lui-button  lui-dialog__footer-button" ng-click="close();">Close</button>
+  </lui-dialog-footer>
+</lui-dialog>

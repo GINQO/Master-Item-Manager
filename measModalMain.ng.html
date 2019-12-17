@@ -1,0 +1,69 @@
+<style>
+    th,
+    td,
+    table,
+    tr {
+      color: inherit;
+      vertical-align: top;
+      border: 1px solid #f2f2f2;
+      background-color: inherit;
+      padding-top: .23076923em;
+      padding-bottom: .23076923em;
+    }
+
+    tr,
+    td,
+    th {
+      width: 200px;
+    }
+  </style>
+
+  <lui-dialog style="max-width: 1200px;">
+    <lui-dialog-header>
+      <lui-dialog-title>Measure Functions</lui-dialog-title>
+    </lui-dialog-header>
+    <lui-dialog-body>
+
+
+
+            <div class="lui-popover__body lui-nopad">
+              <ul class="lui-list">
+                  <li ng-click="CreateMeasure();" class="lui-list__item">
+                      <span class="lui-list__text lui-list__action">Syncronize</span>
+                    </li>
+
+                    <!--
+                    <li ng-click="UpdateMeasure();" class="lui-list__item">
+                        <span class="lui-list__text lui-list__action">Update</span>
+                    </li> -->
+                    <li ng-click="DestroyMeasure();" class="lui-list__item">
+                          <span class="lui-list__text lui-list__action">Delete</span>
+                    </li>
+              </ul>
+            </div>
+            <div class="lui-popover__footer lui-nopad" style="display: flex; justify-content: space-around;">
+              <!-- 2019-08-12 - Maxwell Marchand : Removed because Help should not be embedded under measure specific actions
+              <button title="Help" ng-click="openDialog()" class="lui-fade-button  lui-fade-button--large">
+                  <span class="lui-fade-button__icon  lui-icon  lui-icon--help"></span>
+              </button>
+                -->
+              <!-- 2019-08-12 - Maxwell Marchand : Removed because Partial Reload should not be embedded under measure specific actions
+              <button title="Perform Partial Reload" ng-click="PartialReload()" class="lui-fade-button  lui-fade-button--large">
+                <span class="lui-fade-button__icon  lui-icon  lui-icon--reload"></span>
+              </button>
+              -->
+              <button title="Delete all Measure Items" ng-click="DestroyAllMeasures();" class="lui-fade-button  lui-fade-button--large">
+                <span class="lui-fade-button__icon  lui-icon  lui-icon--bin"></span>
+              </button>
+              <button title="Download Measure Schemas" ng-click="ExportMeasures()" class="lui-fade-button  lui-fade-button--large">
+                  <span class="lui-fade-button__icon lui-icon lui-icon--download"></span>
+                </button>
+
+            </div>
+
+
+    </lui-dialog-body>
+    <lui-dialog-footer>
+      <button class="lui-button  lui-dialog__footer-button" ng-click="close();">Close</button>
+    </lui-dialog-footer>
+  </lui-dialog>

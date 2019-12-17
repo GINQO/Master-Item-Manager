@@ -1,0 +1,68 @@
+<lui-popover style="max-width: 450px;">
+  <lui-popover-header>
+    <lui-popover-title>Measure Profile</lui-popover-title>
+  </lui-popover-header>
+  <lui-popover-body style="font-size:11px;">
+
+    <div style="margin-top: 15px">
+		<b>Measure Name:</b><br />
+      {{MeasureName}}
+    </div>
+    <div style="margin-top: 15px">
+		<b>Measure Description:</b><br />
+      {{MeasureDescription}}
+    </div>
+    <div style="margin-top: 15px">
+		<b>Measure Label Expression:</b><br />
+    <table>
+      <tr>
+        <td style="width:20px; padding: 5px">Unevaluated</td>
+        <td style="width:100px; padding: 5px">{{MeasureLabelExpression}}</td>
+      </tr>
+      <tr>
+        <td style="width:20px; padding: 5px">Evaluated</td>
+        <td style="width:100px; padding: 5px">{{MeasureLabelExpressionEvaluated}}</td>
+      </tr>
+    </table>
+    </div>
+    <div style="margin-top: 15px">
+		<b>Measure Expression:</b><br/>
+      <table>
+        <tr>
+          <td style="width:20px; padding: 5px">Unevaluated</td>
+          <td style="width:100px; padding: 5px">{{MeasureExpression}}</td>
+        </tr>
+        <tr>
+          <td style="width:20px; padding: 5px">Evaluated</td>
+          <td style="width:100px; padding: 5px">{{MeasureExpressionEvaluated}}</td>
+        </tr>
+      </table>
+    </div>
+    <div style="margin-top: 15px">
+		<b>Measure Tags:</b><br />
+      {{MeasureTags}}
+    </div>
+    <div style="margin-top: 15px">
+		<b>Measure Color:</b><br />
+      {{MeasureColor}}
+      <div ng-style="{'background-color':MeasureColor}" style="width:100px; height:10px"></div>
+    </div>
+    <div style="margin-top: 15px">
+		<b>Measure ID:</b><br />
+      {{MeasureID}}
+    </div>
+
+
+      <span style="font-weight:300;" class="lui-list__text">
+        <div style="font-size:12px; color:#595959">{{row[0].qText}}</div>
+        <div style="font-size:11px; color:#A6A6A6">{{row[1].qText}}</div>
+      </span>
+
+  </lui-popover-body>
+  <lui-popover-footer>
+    <button class="lui-button lui-popover__footer-button" ng-click="close();">Close</button>
+    <button class="lui-button lui-button--info lui-popover__footer-button" ng-click="SelectValue()">Toggle Select</button>
+    <!--<button class="lui-button lui-button--info lui-popover__footer-button" ng-click="SelectAlternative()">Select Alternative</button> -->
+
+  </lui-popover-footer>
+</lui-popover>

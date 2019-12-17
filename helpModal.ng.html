@@ -1,0 +1,40 @@
+<style>
+  th,
+  td,
+  table,
+  tr {
+    color: inherit;
+    vertical-align: top;
+    border: 1px solid #f2f2f2;
+    background-color: inherit;
+    padding-top: .23076923em;
+    padding-bottom: .23076923em;
+  }
+
+  tr,
+  td,
+  th {
+    width: 200px;
+  }
+</style>
+
+<lui-dialog style="max-width: 1200px;">
+  <lui-dialog-header>
+    <lui-dialog-title>Help</lui-dialog-title>
+  </lui-dialog-header>
+  <lui-dialog-body>
+    <h1>Extension Instructions: </h1><br>
+    <ol>
+      <li>Import your metrics using the provided excel file.</li>
+      <li>In your Sense application create 2 Tables: One that contains the Measures and one that contains Dimensions from the imported excel file.</li>
+      <li>Selecting a subset of Dimensions or Measures from the Table will allow the Manager app to only perform actions on those selected (No selections means everything is selected)</li>
+      <li>Actions will only be performed on the Master Items defined in the template sheet (Self defined metrics will be unaffected).</li>
+    </ol>
+    
+  </lui-dialog-body>
+  <lui-dialog-footer>
+    <button class="lui-button  lui-dialog__footer-button" ng-click="close();">Close</button>
+  </lui-dialog-footer>
+</lui-dialog>
+
+<!-- <li>Import your metrics using <a href="https://ginqo.box.com/s/altga7hukg16bnzqb7tn1k7i7biqd0jf" target="_blank">this template</a> or the provided excel file</li> -->
