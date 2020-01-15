@@ -27,12 +27,11 @@ Qlik Sense Enterprise >= June 2018
 5. Dimensions required: Field, Name
 
 # Actions	
-1. Create: Inserts Dimensions/Measures based on selections
-2. Update: Updates Dimensions/Measures based on selections
-3. Delete: Deletes Dimensions/Measures based on selections
-4. Partial Reload: Partially reloads dataset to avoid high reload times on large apps (Need to add REPLACE LOADs in Data Load Editor)
-5. Delete All: Deletes ALL Dimensions/Measures (warning: this applies also to metrics not defined through this tool)
-6. Export: Exports Dimensions/Measures from your application so that you can copy them back into your template file for later use.
+1. Syncronize: Inserts & Updates Dimensions/Measures based on selections
+2. Delete: Deletes Dimensions/Measures based on selections
+3. Partial Reload: Partially reloads dataset to avoid high reload times on large apps (Need to add REPLACE LOADs in Data Load Editor)
+4. Delete All: Deletes ALL Dimensions/Measures (warning: this applies also to metrics not defined through this tool)
+5. Export: Exports Dimensions/Measures from your application so that you can copy them back into your template file for later use.
 
 # Authors
 GINQO
