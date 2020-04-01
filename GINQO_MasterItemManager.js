@@ -135,9 +135,17 @@ return {
 														if (!arrayDimensions.includes(row.cells[6].qText)) {
 
 															console.log(row);
-															var dimensionfields = row.cells[1].qText.split(",").map(item => {
-																return item.trim();
-															})
+
+															var qText = row.cells[1].qText;
+															var dimensionfields;
+															if (qText.startsWith('='))  // expression
+																dimensionfields = [qText.trim()];
+															else {  // single field or drill-down field list
+																dimensionfields = qText.split(",").map(item => {
+																	return item.trim();
+																});
+															}
+
 															var labelExpression = row.cells[2].qText;
 															//var description = row.cells[3].qText;
 															var description;
@@ -223,9 +231,17 @@ return {
 																		return item.trim(); // Return item with no whitespace
 																	});
 																	tags.push('Master Item Manager');
-																	var dimensionfields = row.cells[1].qText.split(",").map(item => {
-																		return item.trim();
-																	})
+
+																	var qText = row.cells[1].qText;
+																	var dimensionfields;
+																	if (qText.startsWith('='))  // expression
+																		dimensionfields = [qText.trim()];
+																	else {  // single field or drill-down field list
+																		dimensionfields = qText.split(",").map(item => {
+																			return item.trim();
+																		});
+																	}
+
 																	var qGrouping;
 
 																	if (dimensionfields.length > 1) {
