@@ -1,4 +1,4 @@
-# GINQO Master Item Manager
+# GINQO MasterItemManager
 Our intention was to create an application that would help with efficiency with development, especially around Master Items. Since Master Items are frequently reused across applications, we felt a governed approach would fit best. Using our template file, Master Items can be saved for later creation. Master Items can then be selected using a Qlik table and syncronized or deleted using The Master Item Manager. Finally, by default, the application won't affect your manually created Master Items unless specifically requested, making it a safe tool to use with in conjunction with previously defined apps & master items.
 
 ![](demo.gif)
@@ -27,11 +27,12 @@ Qlik Sense Enterprise >= June 2018
 5. Dimensions required: Field, Name
 
 # Actions	
-1. Syncronize: Inserts & Updates Dimensions/Measures based on selections
-2. Delete: Deletes Dimensions/Measures based on selections
-3. Partial Reload: Partially reloads dataset to avoid high reload times on large apps (Need to add REPLACE LOADs in Data Load Editor)
-4. Delete All: Deletes ALL Dimensions/Measures (warning: this applies also to metrics not defined through this tool)
-5. Export: Exports Dimensions/Measures from your application so that you can copy them back into your template file for later use.
+1. Create: Inserts Dimensions/Measures based on selections
+2. Update: Updates Dimensions/Measures based on selections
+3. Delete: Deletes Dimensions/Measures based on selections
+4. Partial Reload: Partially reloads dataset to avoid high reload times on large apps (Need to add REPLACE LOADs in Data Load Editor)
+5. Delete All: Deletes ALL Dimensions/Measures (warning: this applies also to metrics not defined through this tool)
+6. Export: Exports Dimensions/Measures from your application so that you can copy them back into your template file for later use.
 
 # Authors
 GINQO

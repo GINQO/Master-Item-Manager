@@ -1,8 +1,8 @@
-<lui-popover style="max-width: 450px;">
+<lui-popover style="max-width: 800px;">
   <lui-popover-header>
     <lui-popover-title>Measure Profile</lui-popover-title>
   </lui-popover-header>
-  <lui-popover-body style="font-size:11px;">
+  <lui-popover-body style="font-size:9px;">
 
     <div style="margin-top: 15px">
 		<b>Measure Name:</b><br />
@@ -17,11 +17,11 @@
     <table>
       <tr>
         <td style="width:20px; padding: 5px">Unevaluated</td>
-        <td style="width:100px; padding: 5px">{{MeasureLabelExpression}}</td>
+        <td style="padding: 5px">{{MeasureLabelExpression}}</td>
       </tr>
       <tr>
         <td style="width:20px; padding: 5px">Evaluated</td>
-        <td style="width:100px; padding: 5px">{{MeasureLabelExpressionEvaluated}}</td>
+        <td style="padding: 5px">{{MeasureLabelExpressionEvaluated}}</td>
       </tr>
     </table>
     </div>
@@ -30,11 +30,11 @@
       <table>
         <tr>
           <td style="width:20px; padding: 5px">Unevaluated</td>
-          <td style="width:100px; padding: 5px">{{MeasureExpression}}</td>
+          <td style="padding: 5px">{{MeasureExpression}}</td>
         </tr>
         <tr>
           <td style="width:20px; padding: 5px">Evaluated</td>
-          <td style="width:100px; padding: 5px">{{MeasureExpressionEvaluated}}</td>
+          <td style="padding: 5px">{{MeasureExpressionEvaluated}}</td>
         </tr>
       </table>
     </div>
@@ -45,7 +45,7 @@
     <div style="margin-top: 15px">
 		<b>Measure Color:</b><br />
       {{MeasureColor}}
-      <div ng-style="{'background-color':MeasureColor}" style="width:100px; height:10px"></div>
+      <div ng-style="{'background-color':MeasureColor}" style="height:10px"></div>
     </div>
     <div style="margin-top: 15px">
 		<b>Measure ID:</b><br />

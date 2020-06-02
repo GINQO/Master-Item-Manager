@@ -28,10 +28,9 @@
 
             <div class="lui-popover__body lui-nopad">
               <ul class="lui-list">
-                  <li ng-click="CreateMeasure();" class="lui-list__item">
+                  <li ng-click="ProcessMeasures();" class="lui-list__item">
                       <span class="lui-list__text lui-list__action">Syncronize</span>
                     </li>
-
                     <!--
                     <li ng-click="UpdateMeasure();" class="lui-list__item">
                         <span class="lui-list__text lui-list__action">Update</span>
@@ -57,7 +56,10 @@
               </button>
               <button title="Download Measure Schemas" ng-click="ExportMeasures()" class="lui-fade-button  lui-fade-button--large">
                   <span class="lui-fade-button__icon lui-icon lui-icon--download"></span>
-                </button>
+              </button>
+              <button title="Validate Measure Schemas" ng-click="ConfirmDialogMeas()" class="lui-fade-button  lui-fade-button--large">
+                <span class="lui-fade-button__icon lui-icon lui-icon--table"></span>
+            </button>
 
             </div>
 
