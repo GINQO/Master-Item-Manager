@@ -48,4 +48,4 @@ GINQO
 	- Dimension Value Colors are not exportable in this version
 	- Dimension Value Colors are not importable in this version
 	- Attempting to Export Measure values with corresponding Segment Colors will cause the export to fail
-  - Delimiting for Comma Separation has not been completely handled. Complex cases of expressions might be parsed into multiple excel columns
+  	- Delimiting for Comma Separation has not been completely handled. Complex cases of expressions might be parsed into multiple excel columns
