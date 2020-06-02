@@ -27,8 +27,8 @@
 
       <div class="lui-popover__body lui-nopad">
         <ul class="lui-list">
-          <li ng-click="CreateDimension();" class="lui-list__item">
-            <span class="lui-list__text lui-list__action">Syncronize</span>
+          <li ng-click="ProcessDimensions();" class="lui-list__item">
+            <span class="lui-list__text lui-list__action">Synchronize</span>
           </li>
           <li ng-click="DestroyDimension();" class="lui-list__item">
             <span class="lui-list__text lui-list__action">Delete</span>
@@ -37,11 +37,14 @@
       </div>
       <div class="lui-popover__footer lui-nopad" style="display: flex; justify-content: space-around;">
 
-        <button title="Delete all Dimension Items" ng-click="DestroyAllMeasures();" class="lui-fade-button  lui-fade-button--large">
+        <button title="Delete all Dimension Items" ng-click="DestroyAllDimensions();" class="lui-fade-button  lui-fade-button--large">
           <span class="lui-fade-button__icon  lui-icon  lui-icon--bin"></span>
         </button>
         <button title="Download Dimension Schemas" ng-click="ExportDimensions()" class="lui-fade-button  lui-fade-button--large">
           <span class="lui-fade-button__icon lui-icon lui-icon--download"></span>
+        </button>
+        <button title="Validate Dimension Schemas" ng-click="ConfirmDialogDim()" class="lui-fade-button  lui-fade-button--large">
+          <span class="lui-fade-button__icon lui-icon lui-icon--table"></span>
         </button>
       </div>
 
