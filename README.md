@@ -1,5 +1,8 @@
 # GINQO MasterItemManager
-Our intention was to create an application that would help with efficiency with development, especially around Master Items. Since Master Items are frequently reused across applications, we felt a governed approach would fit best. Using our template file, Master Items can be saved for later creation. Master Items can then be selected using a Qlik table and syncronized or deleted using The Master Item Manager. Finally, by default, the application won't affect your manually created Master Items unless specifically requested, making it a safe tool to use with in conjunction with previously defined apps & master items.
+Our intention was to create an application that would help with **efficiency with development**, *especially around Master Items*. 
+Since Master Items are frequently reused across applications, we felt a *governed approach* would fit best. 
+
+Using our template file, Master Items can be saved for later creation. Master Items can then be selected using a Qlik table and syncronized or deleted using The Master Item Manager. Finally, by default, the application won't affect your manually created Master Items unless specifically requested, making it a safe tool to use with in conjunction with previously defined apps & master items.
 
 ![](demo.gif)
 
