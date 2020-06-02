@@ -4,7 +4,7 @@ Our intention was to create an application that would help with efficiency with 
 ![](demo.gif)
 
 # Prerequisites
-Qlik Sense Enterprise >= June 2018 
+Qlik Sense Enterprise >= February 2019 
 (Desktop not supported)
 
 # Installation
