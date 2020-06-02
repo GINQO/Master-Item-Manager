@@ -15,7 +15,7 @@ Qlik Sense Enterprise >= February 2019
 # Getting Started
 1. Navigate to the Data Load Editor
 2. Create a Data Connection to the template excel file(it is provided in the zip file), dropbox and box.com both work well for this step
-3. Insert the scripts for your Dimensions and Measures tables (add REPLACE LOADs if you want to enable partial reloads for larger applications)
+3. Insert the scripts for your **Dimensions and Measures tables** (you can add **REPLACE LOADs** if you want to enable partial reloads for larger applications)
 4. Back in your Qlik Sense Application, create one table for the template file's Dimensions and another for template file's Measures (Highly recommend qsQuickTableViewer from ChristofSchwarz and Ralf Becher for this https://github.com/ChristofSchwarz/qsQuickTableViewer)
 5. You can now use the Master Item Manager to create your Dimensions and Measures from the provided template file.
 
@@ -26,13 +26,25 @@ Qlik Sense Enterprise >= February 2019
 4. Measures required: Expression, Name
 5. Dimensions required: Field, Name
 
-# Actions	
-1. Create: Inserts Dimensions/Measures based on selections
-2. Update: Updates Dimensions/Measures based on selections
-3. Delete: Deletes Dimensions/Measures based on selections
-4. Partial Reload: Partially reloads dataset to avoid high reload times on large apps (Need to add REPLACE LOADs in Data Load Editor)
-5. Delete All: Deletes ALL Dimensions/Measures (warning: this applies also to metrics not defined through this tool)
-6. Export: Exports Dimensions/Measures from your application so that you can copy them back into your template file for later use.
+# Actions
+General:
+1. Partial Reload: Using REPLACE LOADs in your load script will allow you to leverage this functionality to pull new Dimension/Measure schemas without running a large applications load.
+2. Info/Help: Shows instructions for how to use the GINQO Master Item Manager
+
+Editing Dimensions:
+1. Syncronize: Creates and Updates Dimensions according to your template and selections
+2. Delete: Deletes Dimensions according to your template and selections (requires dimensionID)
+3. Delete All: Deletes ALL Dimensions in the application (warning: this applies also to metrics not defined through your template file)
+4. Export: Will export a template list composite of your Dimension Master Items existing in the app
+5. Validate: Shows which Dimensions your actions (synchronize/delete) will affect
+
+Editing Measures:
+1. Syncronize: Creates and Updates Measures according to your template and selections
+2. Delete: Deletes Measures according to your template and selections (requires measureID)
+3. Delete All: Deletes ALL Measures in the application (warning: this applies also to metrics not defined through your template file)
+4. Export: Will export a template list composite of your Measure Master Items existing in the app
+5. Validate: Shows which Measures your actions (synchronize/delete) will affect
+
 
 # Authors
 GINQO
@@ -41,6 +53,7 @@ GINQO
 2019-12-17: Combined update and create functionality into syncronize option
 2019-12-17: Added preview section after syncronizing to show which Dimensions and Measures will be created
 2019-12-17: Added December 2019 release
+2020-06-01: Improved maintainability and overall performance for large imports. Improved schema handling.
 
 # Known Issues and Limitations
 	- Measure Segments are not exportable in this version
