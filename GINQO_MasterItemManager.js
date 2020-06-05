@@ -295,6 +295,8 @@ define([
 					var tags = row.cells[4].qText;
 					var tagsList = [];
 					if (typeof tags != 'undefined') {
+						tagsList = tags.split(",");
+						console.log(tagsList);
 						tagsList = tagsList.filter(a => a !== '-');
 					}
 					tagsList.push('Master Item Manager')
@@ -364,6 +366,8 @@ define([
 					var tags = row.cells[4].qText;
 					var tagsList = [];
 					if (typeof tags != 'undefined') {
+						tagsList = tags.split(",");
+						console.log(tagsList);
 						tagsList = tagsList.filter(a => a !== '-');
 					}
 					tagsList.push('Master Item Manager')
@@ -788,6 +792,7 @@ define([
 					// 2. Run Confirm Metrics Modal Window
 					$scope.runDimModalConfirm();
 				};
+				// Process Dimensions
 				const ProcessDimensions = () => {
 					// 1. Get MeasureList Object of Existing Measures
 					new Promise((resolve,reject) => {
@@ -845,6 +850,7 @@ define([
 						});
 					})
 				};
+				// Create Dimensions
 				const CreateDimension =(row) => {
 
 				var dimensionfields = row.cells[1].qText.split(",").map(item => {
@@ -878,6 +884,8 @@ define([
 				var tags = row.cells[5].qText;
 				var tagsList = [];
 				if (typeof tags != 'undefined') {
+					tagsList = tags.split(",");
+					console.log(tagsList);
 					tagsList = tagsList.filter(a => a !== '-');
 				}
 
@@ -951,6 +959,8 @@ define([
 					var tags = row.cells[5].qText;
 					var tagsList = [];
 					if (typeof tags != 'undefined') {
+						tagsList = tags.split(",");
+						console.log(tagsList);
 						tagsList = tagsList.filter(a => a !== '-');
 					}
 	
