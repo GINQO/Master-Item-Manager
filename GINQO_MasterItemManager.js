@@ -688,7 +688,7 @@ define([
 
 												item.map(item => {
 													itemsFormatted.push({
-														Field: `"${item.qDim.qFieldDefs[0]}"`, // remove commas to avoid errors,
+														Field: `"${item.qDim.qFieldDefs.join(', ')}"`,
 														Name: `"${item.qDim.title}"`,
 														LabelExpression: `"${item.qDim.qLabelExpression}"`.replace("undefined", ""),
 														Description: `"${item.qMetaDef.description}"`,
