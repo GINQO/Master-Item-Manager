@@ -133,8 +133,10 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                         // format the data
                                         itemsNotFormatted.then((item) => {
                                             item.map(item => {
+
                                                 // console.log(item);
-                                                switch (item.qMeasure.coloring) {
+                                                /*
+                                                switch (item.qMeasure.coloring) { // 2020-09-09 (Riki) Added second statement to check base color
                                                     case undefined:
                                                         item.qMeasure.coloring = {
                                                             baseColor: {
@@ -154,30 +156,29 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                                         }
                                                         break;
                                                 }
+                                                */
 
+                                                // 2020-09-23 (Riki) Parse measure name & id
+                                               var itemName = item.qMeasure.qLabel;
+                                               var itemID = item.qInfo.qId;
 
-                                                
-                                            })
-
-                                            item.map(item => {
-                                                
-                                                //console.log(item);
-
-                                                // 2020-09-09 (Riki) Convert segment color json to comma separated string for the export
-                                                if (item.qMeasure.coloring.gradient != undefined && item.qMeasure.coloring.gradient != '') {
+                                                // 2020-09-09 (Riki) Parse and convert segment color json to comma separated string for exporting
+                                               var segmentColorFormatted
+                                               var segmentColorLimitType
+                                                if (item.qMeasure.coloring.gradient !== undefined && item.qMeasure.coloring.gradient != '') {
                                                     
                                                     // Get segment color json data
-                                                    var segmentColorItem = item.qMeasure.coloring.gradient
-                                                    var segmentColorFormatted=[]
+                                                    var segmentColorItem = item.qMeasure.coloring.gradient;
+                                                    var segmentColorFormatted=[];
 
-                                                    var colors = segmentColorItem.colors  
-                                                    var limits = segmentColorItem.limits 
-                                                    var breaks = segmentColorItem.breakTypes 	
+                                                    var colors = segmentColorItem.colors;  
+                                                    var limits = segmentColorItem.limits;
+                                                    var breaks = segmentColorItem.breakTypes;	
 
                                                     // Get segment color limit number type
-                                                    var segmentColorLimitType = segmentColorItem.limitType	
+                                                    segmentColorLimitType = segmentColorItem.limitType	
                                                     if(segmentColorLimitType == 'absolute'){
-                                                        segmentColorLimitType = 'fixed'
+                                                        segmentColorLimitType = 'fixed';
                                                     }
 
                                                     // Append color code, limit value and gradient to list
@@ -196,20 +197,72 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                                     }
                                                     
                                                     // Join color code list into comma separated string
-                                                    var segmentColorFormatted = segmentColorFormatted.join(",")
+                                                    segmentColorFormatted = segmentColorFormatted.join(",");
                                                     
-                                                }														
+                                                }	
+                                                else {
+                                                    segmentColorFormatted = "";
+                                                    segmentColorLimitType = "";
+
+                                                }													
                                             
+                                                // 2020-09-09 (Riki) Conditional statement to parse Measure description with expression
+                                                var itemDescription;
+                                                if(item.qMeasure.descriptionExpression !== undefined){
+                                                    itemDescription = item.qMeasure.descriptionExpression.qStringExpression.qExpr.replace(/\"/g,'""');
+                                                }
+                                                else{
+                                                    itemDescription = item.qMetaDef.description.replace(/\"/g,'""');
+                                                }
+                                                
+                                                // 2020-09-23 (Riki) Conditional statement to parse Measure base color
+                                                var itemBaseColor;
+                                                if(item.qMeasure.coloring.baseColor !== undefined){
+                                                    itemBaseColor = item.qMeasure.coloring.baseColor.color;
+                                                }
+                                                else{
+                                                    itemBaseColor =  "";
+                                                }
+
+                                                // 2020-09-23 (Riki) Conditional statement to parse Measure Expression
+                                                var itemExpression
+                                                if(item.qMeasure.qDef !== undefined){
+                                                    itemExpression = item.qMeasure.qDef.replace(/\"/g,'""');
+                                                }
+                                                else{
+                                                    itemExpression =  "";
+                                                }
+
+                                                // 2020-09-23 (Riki) Conditional statement to parse Measure Expression
+                                                var itemTags
+                                                if(item.qMetaDef.tags[0] !== undefined){
+                                                    itemTags = item.qMetaDef.tags.join(",");
+                                                }
+                                                else{
+                                                    itemTags =  "";
+                                                }
+                                                
+                                                // 2020-09-23 (Riki) Conditional statement to parse Measure Label Expression
+                                                var itemLabelExpression
+                                                if(item.qMeasure.qLabelExpression !== undefined){
+                                                    itemLabelExpression = item.qMeasure.qLabelExpression.replace(/\"/g,'""');
+                                                }
+                                                else{
+                                                    itemLabelExpression =  "";
+                                                }
+
+
+                                                // 2020-09-23 (Riki) Push data into list
                                                 itemsFormatted.push({
-                                                    Expression: `"'${item.qMeasure.qDef}"`.replace("undefined", ""),
-                                                    Name: `"${item.qMeasure.qLabel}"`,
-                                                    LabelExpression: `"${item.qMeasure.qLabelExpression}"`.replace("undefined", ""),
-                                                    Description: `"${item.qMetaDef.description}"`,
-                                                    Color: `"${item.qMeasure.coloring.baseColor.color}"`,
-                                                    Tags: `"${item.qMetaDef.tags[0]}"`.replace("undefined", ""),
-                                                    SegmentColor: `"${segmentColorFormatted}"`.replace("undefined", ""),  // 2020-09-09 (Riki) Added Segment Color
-                                                    SegmentColorFormat: `"${segmentColorLimitType}"`.replace("undefined", ""),  // 2020-09-09 (Riki) Added Segment Color Format
-                                                    ID: `"${item.qInfo.qId}"`,
+                                                    Expression: `"${itemExpression}"`,
+                                                    Name: `"${itemName}"`,
+                                                    LabelExpression: `"${itemLabelExpression}"`,
+                                                    Description: `"${itemDescription}"`,
+                                                    Color: `"${itemBaseColor}"`,
+                                                    Tags: `"${itemTags}"`,
+                                                    SegmentColor: `"${segmentColorFormatted}"`,
+                                                    SegmentColorFormat: `"${segmentColorLimitType}"`, 
+                                                    ID: `"${itemID}"`,
                                                 });
                                             })
 
@@ -297,6 +350,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                         measureListPropertyItems.forEach((element) => {
                             arrayMeasures.push({
                                 mId:   element.qInfo.qId,
+                                mLabel: element.qMeasure.qLabel,
                                 mGradient: element.qMeasure.coloring.gradient
                             });
                         });                                                                    
@@ -307,26 +361,26 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                 .then(arrayMeasures => {
 
                     var measureIdList = []
+                    var measureGradientList = []
+                    var measureLabelList = []
                     arrayMeasures.forEach(function(entry) {
                         measureIdList.push(entry.mId)
+                        measureGradientList.push(entry.mGradient)
+                        measureLabelList.push(entry.mLabel)
                     });
                     
-                    var measureGradientList = []
-                    arrayMeasures.forEach(function(entry) {
-                        measureGradientList.push(entry.mGradient)
-                    });
                     
                     measurevalues.rows.forEach((row, rowno) => {
                         // 6a. If the Measure already exists, update it instead of creating a new one
-                        var measureIndex = measureIdList.indexOf(row.cells[8].qText)							
-                        if(measureIndex == -1){ 
-                            //console.log('Creating :' + row.cells[8].qText)
+                        var mIndex = measureIdList.indexOf(row.cells[8].qText)							
+                        if(mIndex == -1){ 
+                            console.log('Creating Measure: ' + row.cells[0].qText + ', Id:' + row.cells[8].qText)
                             $scope.CreateMeasure = CreateMeasure(row);
                         } 
                         // 6b. If the Measure does not exist already, create a new one
                         else {
-                            //console.log('Updating :' + measureIdList[measureIndex])									
-                            $scope.UpdateMeasure = UpdateMeasure(row, measureGradientList[measureIndex]);
+                            console.log('Updating Measure: ' + measureLabelList[mIndex] + ', Id:' + measureIdList[mIndex])									
+                            $scope.UpdateMeasure = UpdateMeasure(row, measureGradientList[mIndex]);
                         }
                     });
 
@@ -380,7 +434,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                 var tagsList = [];
                 if (typeof tags != 'undefined') {
                     tagsList = tags.split(",");
-                    console.log(tagsList);
+                    //console.log(tagsList);
                     tagsList = tagsList.filter(a => a !== '-');
                 }
                 tagsList.push('Master Item Manager')
@@ -446,6 +500,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                     }
                 }
                 
+                
                 enigma.app.createMeasure({
                     "qInfo": {
                         "qType": "measure",
@@ -474,7 +529,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                 });
             }
             const UpdateMeasure = (row, gradient) => {
-                console.log("Updated Measures")
+                //console.log("Updated Measures")
                 // For each element that exists in MIM Definition => Do something
                 enigma.app.getMeasure(row.cells[8].qText).then(reply => {
                 // Filter and parse EXPRESSION
@@ -514,7 +569,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                 var tagsList = [];
                 if (typeof tags != 'undefined') {
                     tagsList = tags.split(",");
-                    console.log(tagsList);
+                    //console.log(tagsList);
                     tagsList = tagsList.filter(a => a !== '-');
                 }
                 tagsList.push('Master Item Manager')
@@ -875,7 +930,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                         itemsNotFormatted.then((item) => {
                                             //console.log(item);
                                             item.map(item => {
-                                                console.log(item)
+                                                //console.log(item)
                                                 switch (item.qDim.coloring) {
                                                     case undefined:
                                                         item.qDim.coloring = {
@@ -1100,7 +1155,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
             var tagsList = [];
             if (typeof tags != 'undefined') {
                 tagsList = tags.split(",");
-                console.log(tagsList);
+                //console.log(tagsList);
                 tagsList = tagsList.filter(a => a !== '-');
             }
 
@@ -1175,7 +1230,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                 var tagsList = [];
                 if (typeof tags != 'undefined') {
                     tagsList = tags.split(",");
-                    console.log(tagsList);
+                    //console.log(tagsList);
                     tagsList = tagsList.filter(a => a !== '-');
                 }
 
