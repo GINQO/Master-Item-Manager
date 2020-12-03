@@ -1,8 +1,9 @@
 {
-    "name":" GINQO Master Item Manager",
-    "description":"Service to manage master items from within an application.",
-    "icon":"extension",
-    "type":"visualization",
-    "version":"1.5",
-    "preview":"ginqologo.png",
-    "author":"GINQO Consulting Ltd."}
+    "name": " GINQO Master Item Manager",
+    "description": "Service to manage master items from within an application.",
+    "icon": "extension",
+    "type": "visualization",
+    "version": "1.7",
+    "preview": "ginqologo.png",
+    "author": "GINQO Consulting Ltd."
+}

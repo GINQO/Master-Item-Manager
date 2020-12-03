@@ -57,7 +57,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
              * 												   *
              ***************************************************/
 
-            var measurevalues = app.createTable(['%MI%MeasureName', '%MI%MeasureDescription', '%MI%MeasureLabelExpression', '%MI%MeasureExpression', '%MI%MeasureTags', '%MI%MeasureColor', '%MI%MeasureSegmentColor','%MI%MeasureSegmentColorFormat','%MI%MeasureId'], {
+            var measurevalues = app.createTable(['%MI%MeasureName', '%MI%MeasureDescription', '%MI%MeasureLabelExpression', '%MI%MeasureExpression', '%MI%MeasureTags', '%MI%MeasureColor','%MI%MeasureId','%MI%MeasureSegmentColor','%MI%MeasureSegmentColorFormat'], {
                 rows: 1000
             });
 
@@ -372,14 +372,14 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                     
                     measurevalues.rows.forEach((row, rowno) => {
                         // 6a. If the Measure already exists, update it instead of creating a new one
-                        var mIndex = measureIdList.indexOf(row.cells[8].qText)							
+                        var mIndex = measureIdList.indexOf(row.cells[6].qText)							
                         if(mIndex == -1){ 
-                            console.log('Creating Measure: ' + row.cells[0].qText + ', Id:' + row.cells[8].qText)
+                            console.log(rowno+1 + '. Creating Measure: ' + row.cells[0].qText + ', Id:' + row.cells[6].qText)
                             $scope.CreateMeasure = CreateMeasure(row);
                         } 
                         // 6b. If the Measure does not exist already, create a new one
                         else {
-                            console.log('Updating Measure: ' + measureLabelList[mIndex] + ', Id:' + measureIdList[mIndex])									
+                            console.log(rowno+1 + '. Updating Measure: ' + measureLabelList[mIndex] + ', Id:' + measureIdList[mIndex])									
                             $scope.UpdateMeasure = UpdateMeasure(row, measureGradientList[mIndex]);
                         }
                     });
@@ -439,12 +439,12 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                 }
                 tagsList.push('Master Item Manager')
                 
-                // 2020-09-09 (Riki) Filter and parse SEGMENTCOLOR
+                // 2020-09-09 (Riki) Filter and parse SEGMENTCOLOR                
                 var segmentColor
-                if (typeof row.cells[6].qText != 'undefined'){
+                if (typeof row.cells[7] != 'undefined'){
 					
 					// Get the segment number format from config file
-                    var segmentTypeInput = row.cells[7].qText;
+                    var segmentTypeInput = row.cells[8].qText.toLowerCase();
                     var segmentFormat;
                     switch (true) {
                       case segmentTypeInput == 'percent':
@@ -458,7 +458,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                     }
                     
                     // Get the segment color list from config file, then parse the value to JSON
-                    var segmentColorList = row.cells[6].qText;
+                    var segmentColorList = row.cells[7].qText;
                     if (segmentColorList === '-') {							
                         segmentColor = ''
                     }
@@ -504,7 +504,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                 enigma.app.createMeasure({
                     "qInfo": {
                         "qType": "measure",
-                        "qId": row.cells[8].qText
+                        "qId": row.cells[6].qText
                     },
                     "qMeasure": {
                         "qLabel": row.cells[0].qText,
@@ -531,7 +531,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
             const UpdateMeasure = (row, gradient) => {
                 //console.log("Updated Measures")
                 // For each element that exists in MIM Definition => Do something
-                enigma.app.getMeasure(row.cells[8].qText).then(reply => {
+                enigma.app.getMeasure(row.cells[6].qText).then(reply => {
                 // Filter and parse EXPRESSION
                 var expression
                 if (typeof row.cells[3].qText != 'undefined'){
@@ -577,10 +577,10 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
             
                 // 2020-09-09 (Riki) Filter and parse SEGMENTCOLOR
                 var segmentColor
-                if (typeof row.cells[6].qText != 'undefined'){
+                if (typeof row.cells[7] != 'undefined'){
 					
 					// Get the segment number format from config file
-                    var segmentTypeInput = row.cells[7].qText;
+                    var segmentTypeInput = row.cells[8].qText.toLowerCase();
                     var segmentFormat;
                     switch (true) {
                       case segmentTypeInput == 'percent':
@@ -594,7 +594,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                     }
                     
                     // Get the segment color list from config file, then parse the value to JSON
-                    var segmentColorList = row.cells[6].qText;
+                    var segmentColorList = row.cells[7].qText;
                     if (segmentColorList === '-') {							
                         segmentColor = gradient // if no color list defined in the config file, use the old color instead
                     }
@@ -640,7 +640,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                 reply.setProperties({
                     "qInfo": {
                         "qType": "measure",
-                        "qId": row.cells[8].qText
+                        "qId": row.cells[6].qText
                     },
                     "qMeasure": {
                         "qLabel": row.cells[0].qText,
@@ -668,7 +668,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
             };
             const DestroyMeasure = () => {
                 // 1. Create in memory table of Measures Loaded into the MIM App
-                const table = app.createTable(['%MI%MeasureName', '%MI%MeasureDescription', '%MI%MeasureLabelExpression', '%MI%MeasureExpression', '%MI%MeasureTags', '%MI%MeasureColor', '%MI%MeasureSegmentColor','%MI%MeasureSegmentColorFormat','%MI%MeasureId'], {
+                const table = app.createTable(['%MI%MeasureName', '%MI%MeasureDescription', '%MI%MeasureLabelExpression', '%MI%MeasureExpression', '%MI%MeasureTags', '%MI%MeasureColor','%MI%MeasureId','%MI%MeasureSegmentColor','%MI%MeasureSegmentColorFormat'], {
                     rows: 1000
                 });
 
@@ -680,7 +680,8 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                     new Promise((resolve, reject) => {
                         resolve(
                             table.rows.forEach(element => {
-                                enigma.app.destroyMeasure(element.cells[8].qText)
+                                console.log("Deleting measure id: " + element.cells[6].qText)
+                                enigma.app.destroyMeasure(element.cells[6].qText)
                             })
                         )
                     })
@@ -816,11 +817,13 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                     })
                                     $scope.MeasureTags = row[4].qText;
                                     $scope.MeasureColor = row[5].qText;
-                                    $scope.MeasureSegmentColor = row[6].qText;
-                                    $scope.MeasureSegmentColorFormat = row[7].qText;									
+
+                                    // 2020-11-01 (Riki) Added conditional statement to show measure segment color values
+                                    $scope.MeasureSegmentColor = (typeof row[7] !== 'undefined') ? row[7].qText : "-"; 
+                                    $scope.MeasureSegmentColorFormat =(typeof row[8] !== 'undefined') ? row[8].qText : "-";											
                                     
-                                    $scope.MeasureID = row[8].qText;
-                                    console.log($scope.MeasureID)
+                                    $scope.MeasureID = row[6].qText;
+                                    //console.log($scope.MeasureID)
         
                                     $scope.SelectValue = function () {
                                         app.field('%MI%MeasureId').toggleSelect($scope.MeasureID, true);
@@ -1023,14 +1026,14 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                 alignTo: document.getElementsByClassName("popover")[index], //This is the key to making the popover work and attach to the element
                                 dock: "right",
                                 controller: ['$scope', function ($scope) {
-                                    console.log(enigma.app.engineApp);
+                                    //console.log(enigma.app.engineApp);
                                     $scope.dimensionvalues = dimensionvalues;
                                     $scope.DimensionName = row[0].qText;
                                     $scope.DimensionDescription = row[3].qText;
                                     $scope.DimensionDescriptionEvaluated;
                                     enigma.app.engineApp.expandExpression(row[3].qText).then(reply => {
                                         $scope.DimensionDescriptionEvaluated = reply.qExpandedExpression;
-                                        console.log(reply);
+                                        //console.log(reply);
                                     })
                                     $scope.DimensionLabelExpression = row[2].qText;
                                     $scope.DimensionLabelExpressionEvaluated;
@@ -1041,7 +1044,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                     $scope.DimensionTags = row[5].qText;
                                     $scope.DimensionColor = row[4].qText;
                                     $scope.DimensionID = row[6].qText;
-                                    console.log($scope);
+                                    //console.log($scope);
                                     $scope.SelectValue = function () {
                                         app.field('%MI%DimensionId').toggleSelect($scope.DimensionID, true);
                                         $scope.close();
@@ -1089,7 +1092,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                 // 3. Push the Measures in the MeasureList Object to an Array
                 .then(dimensionListProperties => {
                     var arrayDimensions = [];
-                    console.log(dimensionListProperties);
+                    //console.log(dimensionListProperties);
                     dimensionListProperties.qDimensionList.qItems.forEach((element) => {
                         arrayDimensions.push(element.qInfo.qId)
                     });
@@ -1099,15 +1102,15 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                 .then(arrayDimensions => {
                     //console.log(measurevalues);
                     dimensionvalues.rows.forEach((row, rowno) => {
-                        console.log(row);
+                        //console.log(row);
                         // 4a. If the Dimension does not already exist create it
                         if(!arrayDimensions.includes(row.cells[6].qText)){
-                            console.log('Test');
+                            console.log(rowno+1 + '. Creating Dimension, ID: ' + row.cells[6].qText);
                             $scope.CreateDimension = CreateDimension(row);
                         } 
                         // 4b. If the Dimension does already exist, update
                         else {
-                            console.log('Already exists');
+                            console.log(rowno+1 + '. Updating Dimension, ID: ' + row.cells[6].qText);
                             $scope.UpdateDimension = UpdateDimension(row);
                         }
                     });
@@ -1122,10 +1125,24 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
             };
             // Create Dimensions
             const CreateDimension =(row) => {
-
+            
+            /* 
             var dimensionfields = row.cells[1].qText.split(",").map(item => {
                 return item.trim();
             });
+            */
+
+            // 2020-12-02 (Riki/MarredCheese) Fix importing expression-based dimensions
+            var qText = row.cells[1].qText;
+            var dimensionfields;
+            if (qText.startsWith('='))  // expression
+                dimensionfields = [qText.trim()];
+            else {  // single field or drill-down field list
+                dimensionfields = qText.split(",").map(item => {
+                    return item.trim();
+                });
+            }
+
 
             var labelExpression;
             if (typeof row.cells[2].qText != 'undefined'){
@@ -1198,9 +1215,23 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
             // Update Dimension
             const UpdateDimension = (row) => {
                 // For each element that exists in MIM Definition => Do something
+                /*
                 var dimensionfields = row.cells[1].qText.split(",").map(item => {
                     return item.trim();
                 });
+                */
+               
+                // 2020-12-02 (Riki/MarredCheese) Fix importing expression-based dimensions
+                var qText = row.cells[1].qText;
+                var dimensionfields;
+                if (qText.startsWith('='))  // expression
+                    dimensionfields = [qText.trim()];
+                else {  // single field or drill-down field list
+                    dimensionfields = qText.split(",").map(item => {
+                        return item.trim();
+                    });
+                }
+
 
                 var labelExpression;
                 if (typeof row.cells[2].qText != 'undefined'){
@@ -1287,6 +1318,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                     new Promise((resolve, reject) => {
                         resolve(
                             table.rows.forEach(element => {
+                                console.log("Deleting dimension id: " + element.cells[6].qText)
                                 enigma.app.destroyDimension(element.cells[6].qText)
                             })
                         )
@@ -1411,7 +1443,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                     })
                     // 3. Save the application After Reloading
                     .then(reloadStatus => {
-                        console.log(reloadStatus);
+                        console.log("Reload status: " + reloadStatus);
 
                         return new Promise((resolve, reject) => {
                             resolve(app.doSave())
@@ -1419,7 +1451,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                     })
                     // 4. Display message that Partial Reload is Complete.
                     .then(saveStatus => {
-                        console.log(saveStatus);
+                        //console.log(saveStatus);
 
                         return new Promise((resolve, reject) => {
                             resolve(swal({
