@@ -426,30 +426,27 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
 					}
 
 					// add measure formats to measure values
-					var measures = zip(measurevalues.rows,fmtvalues.rows)
-                    
-                    measures.forEach((row_tuple, rowno) => {
-						var row = row_tuple[0]
-						var fmt = row_tuple[1]
-						
-						// make sure that rows are in same order
-						if(row.cells[6].qText == fmt.cells[0].qText) {
-							var cells = row.cells.concat(fmt.cells.slice(1))
-							
-							// 6a. If the Measure already exists, update it instead of creating a new one
-							var mIndex = measureIdList.indexOf(cells[6].qText)							
-							if(mIndex == -1){ 
-								console.log(rowno+1 + '. Creating Measure: ' + cells[0].qText + ', Id:' + cells[6].qText)
-								$scope.CreateMeasure = CreateMeasure(cells);
-							} 
-							// 6b. If the Measure does not exist already, create a new one
-							else {
-								console.log(rowno+1 + '. Updating Measure: ' + measureLabelList[mIndex] + ', Id:' + measureIdList[mIndex])									
-								$scope.UpdateMeasure = UpdateMeasure(cells, measureGradientList[mIndex]);
-							}
-						}
+					var measures = []
+                 
+                    for(var i=0;i<measurevalues.rows.length;i++){
+                    	for(var j=0;j<fmtvalues.rows.length;j++) {
+                    		if(fmtvalues.rows[j].cells[0].qText == measurevalues.rows[i].cells[6].qText) {
+                    			measures.push(measurevalues.rows[i].cells.concat(fmtvalues.rows[j].cells.slice(1)))
+                    		}
+                    	}
+                    }
+
+                    measures.forEach((cells, rowno) => {			
+						// 6a. If the Measure already exists, update it instead of creating a new one
+						var mIndex = measureIdList.indexOf(cells[6].qText)							
+						if(mIndex == -1){ 
+							console.log(rowno+1 + '. Creating Measure: ' + cells[0].qText + ', Id:' + cells[6].qText)
+							$scope.CreateMeasure = CreateMeasure(cells);
+						} 
+						// 6b. If the Measure does not exist already, create a new one
 						else {
-							console.log("Rows are not in same order!")
+							console.log(rowno+1 + '. Updating Measure: ' + measureLabelList[mIndex] + ', Id:' + measureIdList[mIndex])									
+							$scope.UpdateMeasure = UpdateMeasure(cells, measureGradientList[mIndex]);
 						}
                     });
 
