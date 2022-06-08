@@ -54,15 +54,15 @@ Editing Measures:
 GINQO
 
 # Change Log
-2019-12-17: Combined update and create functionality into syncronize option
-2019-12-17: Added preview section after syncronizing to show which Dimensions and Measures will be created
-2019-12-17: Added December 2019 release
-2022-06-01: Custom format number is now supported
-2020-06-01: Improved maintainability and overall performance for large imports. Improved schema handling.
-2022-06-01: Measure segment colors are now exportable and importable in this version
-2022-06-01: Dimension value colors are now exportable and importable in this version
-2022-06-01: QlikCloud is now supported (Tested version: Februrary 2022)
-2022-06-01: Some enhancements in layout and embedded images
+- 2019-12-17: Combined update and create functionality into syncronize option
+- 2019-12-17: Added preview section after syncronizing to show which Dimensions and Measures will be created
+- 2019-12-17: Added December 2019 release
+- 2022-06-01: Custom format number is now supported
+- 2020-06-01: Improved maintainability and overall performance for large imports. Improved schema handling.
+- 2022-06-01: Measure segment colors are now exportable and importable in this version
+- 2022-06-01: Dimension value colors are now exportable and importable in this version
+- 2022-06-01: QlikCloud is now supported (Tested version: Februrary 2022)
+- 2022-06-01: Some enhancements in layout and embedded images
 
 # Known Issues and Limitations
 	- Complex drildown dimension expression is not supported.
