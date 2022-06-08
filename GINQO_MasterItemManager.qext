@@ -1,9 +1,9 @@
 {
-    "name": " GINQO Master Item Manager",
-    "description": "Service to manage master items from within an application.",
+    "name": " GINQO Master Item Manager - June 2022",
+    "description": "v.1.8 Service to manage master items from within an application.",
     "icon": "extension",
     "type": "visualization",
-    "version": "1.7",
+    "version": "1.8",
     "preview": "ginqologo.png",
     "author": "GINQO Consulting Ltd."
 }

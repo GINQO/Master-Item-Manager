@@ -7,8 +7,9 @@ Using our template file, Master Items can be saved for later creation. Master It
 ![](demo.gif)
 
 # Prerequisites
-Qlik Sense Enterprise >= February 2019 
-(Desktop not supported)
+Qlik Sense Enterprise >= February 2022 
+Qlik Cloud >= February 2022 
+Qlik Sense Desktop >= November 2021
 
 # Installation
 1. Download this extension on a zip file using the 'Clone or Download' button
@@ -56,12 +57,15 @@ GINQO
 2019-12-17: Combined update and create functionality into syncronize option
 2019-12-17: Added preview section after syncronizing to show which Dimensions and Measures will be created
 2019-12-17: Added December 2019 release
+2022-06-01: Custom format number is now supported
 2020-06-01: Improved maintainability and overall performance for large imports. Improved schema handling.
+2022-06-01: Measure segment colors are now exportable and importable in this version
+2022-06-01: Dimension value colors are now exportable and importable in this version
+2022-06-01: QlikCloud is now supported (Tested version: Februrary 2022)
+2022-06-01: Some enhancements in layout and embedded images
 
 # Known Issues and Limitations
-	- Measure Segments are not exportable in this version
-	- Measure Segments are not importable in this version
-	- Dimension Value Colors are not exportable in this version
-	- Dimension Value Colors are not importable in this version
-	- Attempting to Export Measure values with corresponding Segment Colors will cause the export to fail
+	- Complex drildown dimension expression is not supported.
+	- Editing a "base" Master Item that other Master Items call will break all objects reusing it.
+	  Workaround: MAnually save the modified measure: Right-click -> edit the Base item, save it
   	- Delimiting for Comma Separation has not been completely handled. Complex cases of expressions might be parsed into multiple excel columns

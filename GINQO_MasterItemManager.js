@@ -60,7 +60,11 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
             var measurevalues = app.createTable(['%MI%MeasureName', '%MI%MeasureDescription', '%MI%MeasureLabelExpression', '%MI%MeasureExpression', '%MI%MeasureTags', '%MI%MeasureColor','%MI%MeasureId','%MI%MeasureSegmentColor','%MI%MeasureSegmentColorFormat'], {
                 rows: 1000
             });
-
+			
+			var fmtvalues = app.createTable(['%MI%MeasureId','%MI%MeasureFormatType', '%MI%MeasureFormatNDec', '%MI%MeasureFormatUseThou', '%MI%MeasureFormatFmt', '%MI%MeasureFormatDec', '%MI%MeasureFormatThou'], {
+                rows: 1000
+            });
+										
             // Menu option for changing MEASURES
             $scope.openMeasModalMain = function () {
                 // Open luiDialog for actions on Measures
@@ -72,6 +76,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                     controller: ['$scope', '$element', function ($scope, $element) {
                         // Create virtual table of Master Items in $scope
                         $scope.measurevalues = measurevalues;
+						$scope.fmtvalues = fmtvalues;
                         // Method in $scope for Processing Measures
                         $scope.ProcessMeasures = ProcessMeasures;
                         // Method in $scope for DestroyMeasures
@@ -123,7 +128,13 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                             Tags: "%MI%MeasureTags",
                                             SegmentColor: "%MI%MeasureSegmentColor", // 2020-09-09 (Riki) Added Segment Color 
                                             SegmentColorFormat: "%MI%MeasureSegmentColorFormat", // 2020-09-09 (Riki) Added SegmentColor Format
-                                            ID: "%MI%MeasureId"
+                                            ID: "%MI%MeasureId",
+											FormatType: "%MI%MeasureFormatType", // 2022-04-01 (HGR) Added Format Type
+											FormatNDec: "%MI%MeasureFormatNDec", // 2022-04-01 (HGR) Added Format Type
+                                            FormatUseThou: "%MI%MeasureFormatUseThou", // 2022-04-01 (HGR) Added Format Type
+                                            FormatFmt: "%MI%MeasureFormatFmt", // 2022-04-01 (HGR) Added Format Type
+                                            FormatDec: "%MI%MeasureFormatDec", // 2022-04-01 (HGR) Added Format Type
+                                            FormatThou: "%MI%MeasureFormatThou" // 2022-04-01 (HGR) Added Format Type
                                         };
 
 
@@ -252,6 +263,33 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                                 }
 
 
+												// 2022-04-01 (HGR) Added Format Type
+                                                var itemNumFormat
+                                                var itemNumFormatType
+												var itemNumFormatNDec
+                                                var itemNumFormatUseThou
+                                                var itemNumFormatFmt
+                                                var itemNumFormatDec
+                                                var itemNumFormatThou       
+                                                if(item.qMeasure.qNumFormat !== undefined){
+                                                    itemNumFormat = item.qMeasure.qNumFormat;
+                                                    itemNumFormatType = itemNumFormat.qType;
+													itemNumFormatNDec = itemNumFormat.qnDec;
+                                                    itemNumFormatUseThou = itemNumFormat.qUseThou;
+                                                    itemNumFormatFmt = itemNumFormat.qFmt;                                                    
+													itemNumFormatDec = itemNumFormat.qDec;
+                                                    itemNumFormatThou = itemNumFormat.qThou;
+                                                }
+                                                else{
+                                                    itemNumFormat =  "";
+                                                    itemNumFormatType = "";
+													itemNumFormatNDec = 1;
+                                                    itemNumFormatUseThou = 1;
+                                                    itemNumFormatFmt = "";
+                                                    itemNumFormatDec = "";
+                                                    itemNumFormatThou = "";
+                                                }    
+
                                                 // 2020-09-23 (Riki) Push data into list
                                                 itemsFormatted.push({
                                                     Expression: `"${itemExpression}"`,
@@ -263,7 +301,13 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                                     SegmentColor: `"${segmentColorFormatted}"`,
                                                     SegmentColorFormat: `"${segmentColorLimitType}"`, 
                                                     ID: `"${itemID}"`,
-                                                });
+                                                    FormatType: `"${itemNumFormatType}"`,
+													FormatNDec: `"${itemNumFormatNDec}"`,
+                                                    FormatUseThou: `"${itemNumFormatUseThou}"`,
+                                                    FormatFmt: `"${itemNumFormatFmt}"`,
+                                                    FormatDec: `"${itemNumFormatDec}"`,
+                                                    FormatThou: `"${itemNumFormatThou}"`,
+                                                }); 
                                             })
 
                                         }).then(element => {
@@ -368,20 +412,41 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                         measureGradientList.push(entry.mGradient)
                         measureLabelList.push(entry.mLabel)
                     });
-                    
-                    
-                    measurevalues.rows.forEach((row, rowno) => {
-                        // 6a. If the Measure already exists, update it instead of creating a new one
-                        var mIndex = measureIdList.indexOf(row.cells[6].qText)							
-                        if(mIndex == -1){ 
-                            console.log(rowno+1 + '. Creating Measure: ' + row.cells[0].qText + ', Id:' + row.cells[6].qText)
-                            $scope.CreateMeasure = CreateMeasure(row);
-                        } 
-                        // 6b. If the Measure does not exist already, create a new one
-                        else {
-                            console.log(rowno+1 + '. Updating Measure: ' + measureLabelList[mIndex] + ', Id:' + measureIdList[mIndex])									
-                            $scope.UpdateMeasure = UpdateMeasure(row, measureGradientList[mIndex]);
-                        }
+					
+					function zip() {
+						var args = [].slice.call(arguments);
+						var shortest = args.length==0 ? [] : args.reduce(function(a,b){
+							return a.length<b.length ? a : b
+						});
+
+						return shortest.map(function(_,i){
+							return args.map(function(array){return array[i]})
+						});
+					}
+
+					// add measure formats to measure values
+					var measures = []
+                 
+                    for(var i=0;i<measurevalues.rows.length;i++){
+                    	for(var j=0;j<fmtvalues.rows.length;j++) {
+                    		if(fmtvalues.rows[j].cells[0].qText == measurevalues.rows[i].cells[6].qText) {
+                    			measures.push(measurevalues.rows[i].cells.concat(fmtvalues.rows[j].cells.slice(1)))
+                    		}
+                    	}
+                    }
+
+                    measures.forEach((cells, rowno) => {			
+						// 6a. If the Measure already exists, update it instead of creating a new one
+						var mIndex = measureIdList.indexOf(cells[6].qText)							
+						if(mIndex == -1){ 
+							console.log(rowno+1 + '. Creating Measure: ' + cells[0].qText + ', Id:' + cells[6].qText)
+							$scope.CreateMeasure = CreateMeasure(cells);
+						} 
+						// 6b. If the Measure does not exist already, create a new one
+						else {
+							console.log(rowno+1 + '. Updating Measure: ' + measureLabelList[mIndex] + ', Id:' + measureIdList[mIndex])									
+							$scope.UpdateMeasure = UpdateMeasure(cells, measureGradientList[mIndex]);
+						}
                     });
 
                 })
@@ -396,41 +461,41 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                     // })
                 })
             }
-            const CreateMeasure =(row) => {
+            const CreateMeasure =(cells) => {
                 // Filter and parse EXPRESSION
                 var expression
-                if (typeof row.cells[3].qText != 'undefined'){
-                    expression = row.cells[3].qText;
+                if (typeof cells[3].qText != 'undefined'){
+                    expression = cells[3].qText;
                 }
                 if (expression === '-') {
                     expression = '';
                 }
                 // Filter and parse LABELEXPRESSION
                 var labelExpression
-                if (typeof row.cells[2].qText != 'undefined'){
-                    labelExpression = row.cells[2].qText;
+                if (typeof cells[2].qText != 'undefined'){
+                    labelExpression = cells[2].qText;
                 }
                 if (labelExpression === '-') {
                     labelExpression = '';
                 }
                 // Filter and parse COLOR
                 var color
-                if (typeof row.cells[5].qText != 'undefined'){
-                    color = row.cells[5].qText;
+                if (typeof cells[5].qText != 'undefined'){
+                    color = cells[5].qText;
                 }
                 if (color === '-') {
                     color = '';
                 }
                 // Filter and parse DESCRIPTION
                 var description;
-                if (typeof row.cells[1].qText != 'undefined'){
-                    description = row.cells[1].qText;
+                if (typeof cells[1].qText != 'undefined'){
+                    description = cells[1].qText;
                 }
                 if (description === '-') {
                     description = '';
                 }
                 // Filter and parse TAGS
-                var tags = row.cells[4].qText;
+                var tags = cells[4].qText;
                 var tagsList = [];
                 if (typeof tags != 'undefined') {
                     tagsList = tags.split(",");
@@ -441,10 +506,10 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                 
                 // 2020-09-09 (Riki) Filter and parse SEGMENTCOLOR                
                 var segmentColor
-                if (typeof row.cells[7] != 'undefined'){
+                if (typeof cells[7] != 'undefined'){
 					
 					// Get the segment number format from config file
-                    var segmentTypeInput = row.cells[8].qText.toLowerCase();
+                    var segmentTypeInput = cells[8].qText.toLowerCase();
                     var segmentFormat;
                     switch (true) {
                       case segmentTypeInput == 'percent':
@@ -458,7 +523,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                     }
                     
                     // Get the segment color list from config file, then parse the value to JSON
-                    var segmentColorList = row.cells[7].qText;
+                    var segmentColorList = cells[7].qText;
                     if (segmentColorList === '-') {							
                         segmentColor = ''
                     }
@@ -499,15 +564,71 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                     
                     }
                 }
+				
+								// HGR 2022-04-01 Added Measure Format
+				if(cells.length >= 15) {
+					// Filter and parse FormatType
+					var formatType;
+					if (typeof cells[9].qText != 'undefined'){
+						formatType = cells[9].qText;
+					}
+					if (formatType === '-') {
+						formatType = '';
+					}
+					
+					// Filter and parse FormatNDec
+					var formatNDec;
+					if (typeof cells[10].qText != 'undefined'){
+						formatNDec = cells[10].qText;
+					}
+					if (formatNDec === '-') {
+						formatNDec = '';
+					}
+					
+					// Filter and parse FormatUseThou
+					var formatUseThou;
+					if (typeof cells[11].qText != 'undefined'){
+						formatUseThou = cells[11].qText;
+					}
+					if (formatUseThou === '-') {
+						formatUseThou = '';
+					}
+					
+					// Filter and parse FormatFmt
+					var formatFmt;
+					if (typeof cells[12].qText != 'undefined'){
+						formatFmt = cells[12].qText;
+					}
+					if (formatFmt === '-') {
+						formatFmt = '';
+					}
+									
+					// Filter and parse FormatDec
+					var formatDec;
+					if (typeof cells[13].qText != 'undefined'){
+						formatDec = cells[13].qText;
+					}
+					if (formatDec === '-') {
+						formatDec = '';
+					}
+									
+					// Filter and parse FormatThou
+					var formatThou;
+					if (typeof cells[14].qText != 'undefined'){
+						formatThou = cells[14].qText;
+					}
+					if (formatThou === '-') {
+						formatThou = '';
+					}
+                }    
                 
-                
-                enigma.app.createMeasure({
+                var properties = {
                     "qInfo": {
                         "qType": "measure",
-                        "qId": row.cells[6].qText
+                        "qId": cells[6].qText
                     },
                     "qMeasure": {
-                        "qLabel": row.cells[0].qText,
+                        "qLabel": cells[0].qText,
                         "qDef": expression,
                         "qGrouping": "N",
                         "qLabelExpression": labelExpression,
@@ -519,53 +640,65 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                             },
                             "gradient": segmentColor // 2020-09-09 (Riki) Added segment color
                         },
-                        "qActiveExpression": 0
+                        "qActiveExpression": 0,
+						
+						// HGR 2022-04-01 Added Number Format
+						"qNumFormat": {
+							"qType": formatType,
+							"qnDec": parseInt(formatNDec),
+							"qUseThou": parseInt(formatUseThou),
+							"qFmt": formatFmt,
+							"qDec": formatDec,
+							"qThou": formatThou
+						}
                     },
                     "qMetaDef": {
-                        "title": row.cells[0].qText,
+                        "title": cells[0].qText,
                         "description": description, // Description:
                         "tags": tagsList, //Tags:
                     }
-                });
+                };
+				
+                enigma.app.createMeasure(properties);
             }
-            const UpdateMeasure = (row, gradient) => {
+            const UpdateMeasure = (cells, gradient) => {
                 //console.log("Updated Measures")
                 // For each element that exists in MIM Definition => Do something
-                enigma.app.getMeasure(row.cells[6].qText).then(reply => {
+                enigma.app.getMeasure(cells[6].qText).then(reply => {
                 // Filter and parse EXPRESSION
                 var expression
-                if (typeof row.cells[3].qText != 'undefined'){
-                    expression = row.cells[3].qText;
+                if (typeof cells[3].qText != 'undefined'){
+                    expression = cells[3].qText;
                 }
                 if (expression === '-') {
                     expression = '';
                 }
                 // Filter and parse LABELEXPRESSION
                 var labelExpression
-                if (typeof row.cells[2].qText != 'undefined'){
-                    labelExpression = row.cells[2].qText;
+                if (typeof cells[2].qText != 'undefined'){
+                    labelExpression = cells[2].qText;
                 }
                 if (labelExpression === '-') {
                     labelExpression = '';
                 }
                 // Filter and parse COLOR
                 var color
-                if (typeof row.cells[5].qText != 'undefined'){
-                    color = row.cells[5].qText;
+                if (typeof cells[5].qText != 'undefined'){
+                    color = cells[5].qText;
                 }
                 if (color === '-') {
                     color = '';
                 }
                 // Filter and parse DESCRIPTION
                 var description;
-                if (typeof row.cells[1].qText != 'undefined'){
-                    description = row.cells[1].qText;
+                if (typeof cells[1].qText != 'undefined'){
+                    description = cells[1].qText;
                 }
                 if (description === '-') {
                     description = '';
                 }
                 // Filter and parse TAGS
-                var tags = row.cells[4].qText;
+                var tags = cells[4].qText;
                 var tagsList = [];
                 if (typeof tags != 'undefined') {
                     tagsList = tags.split(",");
@@ -577,10 +710,10 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
             
                 // 2020-09-09 (Riki) Filter and parse SEGMENTCOLOR
                 var segmentColor
-                if (typeof row.cells[7] != 'undefined'){
+                if (typeof cells[7] != 'undefined'){
 					
 					// Get the segment number format from config file
-                    var segmentTypeInput = row.cells[8].qText.toLowerCase();
+                    var segmentTypeInput = cells[8].qText.toLowerCase();
                     var segmentFormat;
                     switch (true) {
                       case segmentTypeInput == 'percent':
@@ -594,7 +727,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                     }
                     
                     // Get the segment color list from config file, then parse the value to JSON
-                    var segmentColorList = row.cells[7].qText;
+                    var segmentColorList = cells[7].qText;
                     if (segmentColorList === '-') {							
                         segmentColor = gradient // if no color list defined in the config file, use the old color instead
                     }
@@ -635,15 +768,71 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                     
                     }
                 }
-                
-                
-                reply.setProperties({
+				
+				// HGR 2022-04-01 Added Measure Format
+				if(cells.length >= 15) {
+					// Filter and parse FormatType
+					var formatType;
+					if (typeof cells[9].qText != 'undefined'){
+						formatType = cells[9].qText;
+					}
+					if (formatType === '-') {
+						formatType = '';
+					}
+					
+					// Filter and parse FormatNDec
+					var formatNDec;
+					if (typeof cells[10].qText != 'undefined'){
+						formatNDec = cells[10].qText;
+					}
+					if (formatNDec === '-') {
+						formatNDec = '';
+					}
+					
+					// Filter and parse FormatUseThou
+					var formatUseThou;
+					if (typeof cells[11].qText != 'undefined'){
+						formatUseThou = cells[11].qText;
+					}
+					if (formatUseThou === '-') {
+						formatUseThou = '';
+					}
+					
+					// Filter and parse FormatFmt
+					var formatFmt;
+					if (typeof cells[12].qText != 'undefined'){
+						formatFmt = cells[12].qText;
+					}
+					if (formatFmt === '-') {
+						formatFmt = '';
+					}
+									
+					// Filter and parse FormatDec
+					var formatDec;
+					if (typeof cells[13].qText != 'undefined'){
+						formatDec = cells[13].qText;
+					}
+					if (formatDec === '-') {
+						formatDec = '';
+					}
+									
+					// Filter and parse FormatThou
+					var formatThou;
+					if (typeof cells[14].qText != 'undefined'){
+						formatThou = cells[14].qText;
+					}
+					if (formatThou === '-') {
+						formatThou = '';
+					}
+                }    
+				
+				var properties = {
                     "qInfo": {
                         "qType": "measure",
-                        "qId": row.cells[6].qText
+                        "qId": cells[6].qText
                     },
                     "qMeasure": {
-                        "qLabel": row.cells[0].qText,
+                        "qLabel": cells[0].qText,
                         "qDef": expression,
                         "qGrouping": "N",
                         "qLabelExpression": labelExpression,
@@ -655,14 +844,26 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                             },
                             "gradient": segmentColor // 2020-09-09 (Riki) Added segment color
                         },
-                        "qActiveExpression": 0
+                        "qActiveExpression": 0,
+						
+						// HGR 2022-04-01 Added Number Format
+						"qNumFormat": {
+							"qType": formatType,
+							"qnDec": parseInt(formatNDec),
+							"qUseThou": parseInt(formatUseThou),
+							"qFmt": formatFmt,
+							"qDec": formatDec,
+							"qThou": formatThou
+						}
                     },
                     "qMetaDef": {
-                        "title": row.cells[0].qText,
+                        "title": cells[0].qText,
                         "description": description, // Description:
                         "tags": tagsList, //Tags:
                     }
-                });
+                };
+				
+                reply.setProperties(properties);
                     
                 });
             };
@@ -675,7 +876,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                 // 2. Create listener to detect new data in table api
                 let listener = () => { 
                     console.log("1. Deleting Measures... (Sync started)");
-
+                    
                     // 3. Destroy each measure in the table
                     new Promise((resolve, reject) => {
                         resolve(
