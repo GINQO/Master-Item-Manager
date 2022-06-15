@@ -51,7 +51,8 @@ Editing Measures:
 
 
 # Authors
-GINQO
+Maxwell Marchand
+Riki Suharda
 
 # Change Log
 - 2019-12-17: Combined update and create functionality into syncronize option
