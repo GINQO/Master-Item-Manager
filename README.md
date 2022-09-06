@@ -1,8 +1,8 @@
-# GINQO MasterItemManager
-Our intention was to create an application that would help with **efficiency with development**, *especially around Master Items*. 
-Since Master Items are frequently reused across applications, we felt a *governed approach* would fit best. 
+# GINQO Master Item Manager
+Our intention at GINQO was to create an application that would help most with **efficiency with development**, *especially around Master Items*. 
+Since Master Items are frequently reused across applications, and the process for development is slow, we felt a *governed approach* would fit best. 
 
-Using our template file, Master Items can be saved for later creation. Master Items can then be selected using a Qlik table and syncronized or deleted using The Master Item Manager. Finally, by default, the application won't affect your manually created Master Items unless specifically requested, making it a safe tool to use with in conjunction with previously defined apps & master items.
+Using our template file, Master Items can be saved in excel for load and creation in Qlik Sense. Master Items can then be selected from a Qlik table, previewed (in batch), then syncronized or deleted using **The Master Item Manager** tool. Finally, by default, the application won't affect your manually created Master Items unless you first export them into the template file, making it a safe tool to use with in conjunction with previously defined apps & master items.
 
 ![](demo.gif)
 
@@ -12,9 +12,9 @@ Qlik Cloud >= February 2022
 Qlik Sense Desktop >= November 2021
 
 # Installation
-1. Download this extension on a zip file using the 'Clone or Download' button
+1. Download this extension on a zip file using the 'Clone or Download' button (or select from an individual release)
 2. Navigate to the 'Extensions' directory under the Qlik Management Console (QMC)
-3. Import the zip file
+3. Import the zip file (note: you can only have version of the Master Item Manager imported at any given time, so you may need to delete the old version when reimporting)
 
 # Getting Started
 1. Navigate to the Data Load Editor
@@ -22,6 +22,36 @@ Qlik Sense Desktop >= November 2021
 3. Insert the scripts for your **Dimensions and Measures tables** (you can add **REPLACE LOADs** if you want to enable partial reloads for larger applications)
 4. Back in your Qlik Sense Application, create one table for the template file's Dimensions and another for template file's Measures (Highly recommend qsQuickTableViewer from ChristofSchwarz and Ralf Becher for this https://github.com/ChristofSchwarz/qsQuickTableViewer)
 5. You can now use the Master Item Manager to create your Dimensions and Measures from the provided template file.
+
+# Simples Script Example
+Set HidePrefix = '%';
+
+[Dimensions]:
+REPLACE LOAD
+	[%MI%DimensionField],
+	[%MI%DimensionName],
+	[%MI%DimensionLabelExpression],
+	[%MI%DimensionDescription],
+	[%MI%DimensionColor],
+	[%MI%DimensionTags],
+	[%MI%DimensionId]
+ FROM [lib://AttachedFiles/Master Item Manager.xlsx]
+(ooxml, embedded labels, table is Dimensions);
+
+[Measures]:
+REPLACE LOAD
+	[%MI%MeasureExpression],
+	[%MI%MeasureName],
+	[%MI%MeasureLabelExpression],
+	[%MI%MeasureDescription],
+	[%MI%MeasureColor],
+	[%MI%MeasureTags],
+	[%MI%MeasureSegmentColor],
+	[%MI%MeasureSegmentColorFormat],
+	[%MI%MeasureId]
+ FROM [lib://AttachedFiles/Master Item Manager.xlsx]
+(ooxml, embedded labels, table is Measures);
+
 
 # Using the Template file
 1. Dimensions and Measures must have unique ID's
