@@ -24,6 +24,7 @@ Qlik Sense Desktop >= November 2021
 5. You can now use the Master Item Manager to create your Dimensions and Measures from the provided template file.
 
 # Simples Script Example
+```
 Set HidePrefix = '%';
 
 [Dimensions]:
@@ -51,7 +52,7 @@ REPLACE LOAD
 	[%MI%MeasureId]
  FROM [lib://AttachedFiles/Master Item Manager.xlsx]
 (ooxml, embedded labels, table is Measures);
-
+```
 
 # Using the Template file
 1. Dimensions and Measures must have unique ID's
