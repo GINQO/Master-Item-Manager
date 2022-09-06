@@ -25,10 +25,10 @@ Qlik Sense Desktop >= November 2021
 
 # Simple Script Example
 ```
-Set HidePrefix = '%';
+Set HidePrefix = '%';		// Hide prefix to hide Master Item Manager selections from UI
 
 [Dimensions]:
-REPLACE LOAD
+REPLACE LOAD			// Replace Load to allow for partial reloads (slims down the reload time)
 	[%MI%DimensionField],
 	[%MI%DimensionName],
 	[%MI%DimensionLabelExpression],
@@ -83,7 +83,7 @@ Editing Measures:
 
 
 # Authors
-Maxwell Marchand - Lead and Founder
+Maxwell Marchand - Product Lead and Founder
 Riki Suharda - Developer
 
 # Change Log
