@@ -1,6 +1,6 @@
 # GINQO Master Item Manager
-Our intention at GINQO was to create an application that would help most with **efficiency with development**, *especially around Master Items*. 
-Since Master Items are frequently reused across applications, and the process for development is slow, we felt a *governed approach* would fit best. 
+Our intention at GINQO was to create an application that would help most with **efficiency in development**, *especially around Master Items*. 
+Since Master Items are frequently reused across applications, and the process for creating them is a slow and manual one, we felt a *governed approach* would fit best. 
 
 Using our template file, Master Items can be saved in excel for load and creation in Qlik Sense. Master Items can then be selected from a Qlik table, previewed (in batch), then syncronized or deleted using **The Master Item Manager** tool. Finally, by default, the application won't affect your manually created Master Items unless you first export them into the template file, making it a safe tool to use with in conjunction with previously defined apps & master items.
 
