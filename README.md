@@ -23,7 +23,7 @@ Qlik Sense Desktop >= November 2021
 4. Back in your Qlik Sense Application, create one table for the template file's Dimensions and another for template file's Measures (Highly recommend qsQuickTableViewer from ChristofSchwarz and Ralf Becher for this https://github.com/ChristofSchwarz/qsQuickTableViewer)
 5. You can now use the Master Item Manager to create your Dimensions and Measures from the provided template file.
 
-# Simples Script Example
+# Simple Script Example
 ```
 Set HidePrefix = '%';
 
