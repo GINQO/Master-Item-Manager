@@ -223,7 +223,11 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                                     itemDescription = item.qMeasure.descriptionExpression.qStringExpression.qExpr.replace(/\"/g,'""');
                                                 }
                                                 else{
-                                                    itemDescription = item.qMetaDef.description.replace(/\"/g,'""');
+                                                    	if(item.qMetaDef.description !== undefined){
+                                                    		itemDescription = item.qMetaDef.description.replace(/\"/g,'""');
+							} else {
+								itemDescription = "";
+							}
                                                 }
                                                 
                                                 // 2020-09-23 (Riki) Conditional statement to parse Measure base color
