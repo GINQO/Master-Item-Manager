@@ -1,3 +1,5 @@
+# Hello
+
 # GINQO Master Item Manager
 Our intention at GINQO was to create an application that would help most with **efficiency in development**, *especially around Master Items*. 
 Since Master Items are frequently reused across applications, and the process for creating them is a slow and manual one, we felt a *governed approach* would fit best. 
