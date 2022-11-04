@@ -709,7 +709,10 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                     //console.log(tagsList);
                     tagsList = tagsList.filter(a => a !== '-');
                 }
+		// 2022-11-04 (goos-it) check if tag 'Master Item Manager' exists before pushing it to the array (to prevent duplicates on export/import cycle)
+             	if	(!tagsList.includes('Master Item Manager')) {					
                 tagsList.push('Master Item Manager')
+                }
     
             
                 // 2020-09-09 (Riki) Filter and parse SEGMENTCOLOR
