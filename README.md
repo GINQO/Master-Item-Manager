@@ -7,9 +7,9 @@ Using our template file, Master Items can be saved in excel for load and creatio
 ![](demo.gif)
 
 # Prerequisites
-Qlik Sense Enterprise >= February 2022 
-Qlik Cloud >= February 2022 
-Qlik Sense Desktop >= November 2021
+Qlik Sense Enterprise >= November 2022 
+Qlik Cloud >= November 2022 
+Qlik Sense Desktop >= November 2022
 
 # Installation
 1. Download this extension on a zip file using the 'Clone or Download' button (or select from an individual release)
