@@ -1079,7 +1079,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                     $scope.DimensionField = typeof headerColIndex['%MI%DimensionField'] !== 'undefined' ? row[headerColIndex['%MI%DimensionField']].qText : "-";
                                     $scope.DimensionTags = typeof headerColIndex['%MI%DimensionTags'] !== 'undefined' ? row[headerColIndex['%MI%DimensionTags']].qText : "-";                 
                                     $scope.DimensionColor = typeof headerColIndex['%MI%DimensionColor'] !== 'undefined' ? row[headerColIndex['%MI%DimensionColor']].qText : "-";
-                                    $scope.DimensionID = typeof headerColIndex['%MI%DimensionId'] !== 'undefined' ? row[headerColIndex['%MI%DimensionName']].qText : "-";
+                                    $scope.DimensionID = typeof headerColIndex['%MI%DimensionId'] !== 'undefined' ? row[headerColIndex['%MI%DimensionId']].qText : "-";
                                     //console.log($scope);
                                     $scope.SelectValue = function () {
                                         app.field('%MI%DimensionId').toggleSelect($scope.DimensionID, true);
