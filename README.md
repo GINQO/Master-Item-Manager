@@ -97,6 +97,8 @@ Riki Suharda - Developer
 - 2022-06-01: QlikCloud is now supported (Tested version: Februrary 2022)
 - 2022-06-01: Some enhancements in layout and embedded images
 - 2022-09-06: Fixes for media image links (.tff and .woff) display incorrect on Qlik Sense Enterprise
+- 2022-12-21: Major updates on js code for handling missing columns in config file
+- 2022-12-21: Fixed the master item preview that was not displaying correctly due to a missing config column
 
 # Known Issues and Limitations
 	- Complex drilldown dimension expression is not supported.
