@@ -7,9 +7,9 @@ Using our template file, Master Items can be saved in excel for load and creatio
 ![](demo.gif)
 
 # Prerequisites
-Qlik Sense Enterprise >= February 2022 
-Qlik Cloud >= February 2022 
-Qlik Sense Desktop >= November 2021
+- Qlik Sense Enterprise >= November 2022 
+- Qlik Cloud >= November 2022 
+- Qlik Sense Desktop >= November 2022
 
 # Installation
 1. Download this extension on a zip file using the 'Clone or Download' button (or select from an individual release)
@@ -83,8 +83,8 @@ Editing Measures:
 
 
 # Authors
-Maxwell Marchand - Product Lead and Founder
-Riki Suharda - Developer
+- Maxwell Marchand - Product Lead and Founder
+- Riki Suharda - Developer
 
 # Change Log
 - 2019-12-17: Combined update and create functionality into syncronize option
@@ -97,6 +97,8 @@ Riki Suharda - Developer
 - 2022-06-01: QlikCloud is now supported (Tested version: Februrary 2022)
 - 2022-06-01: Some enhancements in layout and embedded images
 - 2022-09-06: Fixes for media image links (.tff and .woff) display incorrect on Qlik Sense Enterprise
+- 2022-12-21: Major updates on js code for handling missing columns in config file
+- 2022-12-21: Fixed the master item preview that was not displaying correctly due to a missing config column
 
 # Known Issues and Limitations
 	- Complex drilldown dimension expression is not supported.

@@ -57,16 +57,39 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
              * 												   *
              ***************************************************/
 
-            var measurevalues = app.createTable(['%MI%MeasureName', '%MI%MeasureDescription', '%MI%MeasureLabelExpression', '%MI%MeasureExpression', '%MI%MeasureTags', '%MI%MeasureColor','%MI%MeasureId','%MI%MeasureSegmentColor','%MI%MeasureSegmentColorFormat'], {
+            // Set header for Qlik table containing all measure properties from the config data.
+            var measureTable = app.createTable([
+                , '%MI%MeasureName'
+                , '%MI%MeasureDescription'
+                , '%MI%MeasureLabelExpression'
+                , '%MI%MeasureExpression'
+                , '%MI%MeasureTags'
+                , '%MI%MeasureColor'
+                , '%MI%MeasureSegmentColor'
+                , '%MI%MeasureSegmentColorFormat'
+                , '%MI%MeasureId'
+            
+            ], {
                 rows: 1000
             });
-			
-			var fmtvalues = app.createTable(['%MI%MeasureId','%MI%MeasureFormatType', '%MI%MeasureFormatNDec', '%MI%MeasureFormatUseThou', '%MI%MeasureFormatFmt', '%MI%MeasureFormatDec', '%MI%MeasureFormatThou'], {
+
+            // Qlik Table does not allow us to create a table with more than 10 columns, 
+            // so we need to create another table to store the remaining properties.
+			var measureFormatTable = app.createTable([       
+                  '%MI%MeasureId'         
+                , '%MI%MeasureFormatType'
+                , '%MI%MeasureFormatNDec'
+                , '%MI%MeasureFormatUseThou'
+                , '%MI%MeasureFormatFmt'
+                , '%MI%MeasureFormatDec'
+                , '%MI%MeasureFormatThou' 
+            ], {
                 rows: 1000
             });
-										
+
             // Menu option for changing MEASURES
             $scope.openMeasModalMain = function () {
+                console.log("Opened Measure Modal")
                 // Open luiDialog for actions on Measures
                 luiDialog.show({
                     template: measModalWindow,
@@ -75,8 +98,8 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                     },
                     controller: ['$scope', '$element', function ($scope, $element) {
                         // Create virtual table of Master Items in $scope
-                        $scope.measurevalues = measurevalues;
-						$scope.fmtvalues = fmtvalues;
+                        $scope.measureTable = measureTable;
+                        $scope.measureFormatTable = measureFormatTable;
                         // Method in $scope for Processing Measures
                         $scope.ProcessMeasures = ProcessMeasures;
                         // Method in $scope for DestroyMeasures
@@ -108,7 +131,6 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                     })
                                     const results = Promise.all(measDef);
 
-
                                     results.then(reply => {
                                         //console.log(results)
                                         const testArray = reply.map(element => {
@@ -126,8 +148,8 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                             Description: "%MI%MeasureDescription",
                                             Color: "%MI%MeasureColor",
                                             Tags: "%MI%MeasureTags",
-                                            SegmentColor: "%MI%MeasureSegmentColor", // 2020-09-09 (Riki) Added Segment Color 
-                                            SegmentColorFormat: "%MI%MeasureSegmentColorFormat", // 2020-09-09 (Riki) Added SegmentColor Format
+                                            SegmentColor: "%MI%MeasureSegmentColor", // 2020-09-09 (RS) Added Segment Color 
+                                            SegmentColorFormat: "%MI%MeasureSegmentColorFormat", // 2020-09-09 (RS) Added SegmentColor Format
                                             ID: "%MI%MeasureId",
 											FormatType: "%MI%MeasureFormatType", // 2022-04-01 (HGR) Added Format Type
 											FormatNDec: "%MI%MeasureFormatNDec", // 2022-04-01 (HGR) Added Format Type
@@ -145,35 +167,11 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                         itemsNotFormatted.then((item) => {
                                             item.map(item => {
 
-                                                // console.log(item);
-                                                /*
-                                                switch (item.qMeasure.coloring) { // 2020-09-09 (Riki) Added second statement to check base color
-                                                    case undefined:
-                                                        item.qMeasure.coloring = {
-                                                            baseColor: {
-                                                                color: "",
-                                                                index: -1
-                                                            }
-                                                        };
-                                                        break;
-                                                }
-                                                switch (Object.keys(item.qMeasure.coloring).length) {
-                                                    case 0:
-                                                        item.qMeasure.coloring = {
-                                                            baseColor: {
-                                                                color: "",
-                                                                index: -1
-                                                            }
-                                                        }
-                                                        break;
-                                                }
-                                                */
-
-                                                // 2020-09-23 (Riki) Parse measure name & id
+                                               // 2020-09-23 (RS) Parse measure name & id
                                                var itemName = item.qMeasure.qLabel;
                                                var itemID = item.qInfo.qId;
 
-                                                // 2020-09-09 (Riki) Parse and convert segment color json to comma separated string for exporting
+                                                // 2020-09-09 (RS) Parse and convert segment color json to comma separated string for exporting
                                                var segmentColorFormatted
                                                var segmentColorLimitType
                                                 if (item.qMeasure.coloring.gradient !== undefined && item.qMeasure.coloring.gradient != '') {
@@ -217,7 +215,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
 
                                                 }													
                                             
-                                                // 2020-09-09 (Riki) Conditional statement to parse Measure description with expression
+                                                // 2020-09-09 (RS) Conditional statement to parse Measure description with expression
                                                 var itemDescription;
                                                 if(item.qMeasure.descriptionExpression !== undefined){
                                                     itemDescription = item.qMeasure.descriptionExpression.qStringExpression.qExpr.replace(/\"/g,'""');
@@ -226,7 +224,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                                     itemDescription = item.qMetaDef.description.replace(/\"/g,'""');
                                                 }
                                                 
-                                                // 2020-09-23 (Riki) Conditional statement to parse Measure base color
+                                                // 2020-09-23 (RS) Conditional statement to parse Measure base color
                                                 var itemBaseColor;
                                                 if(item.qMeasure.coloring.baseColor !== undefined){
                                                     itemBaseColor = item.qMeasure.coloring.baseColor.color;
@@ -235,7 +233,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                                     itemBaseColor =  "";
                                                 }
 
-                                                // 2020-09-23 (Riki) Conditional statement to parse Measure Expression
+                                                // 2020-09-23 (RS) Conditional statement to parse Measure Expression
                                                 var itemExpression
                                                 if(item.qMeasure.qDef !== undefined){
                                                     itemExpression = item.qMeasure.qDef.replace(/\"/g,'""');
@@ -244,7 +242,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                                     itemExpression =  "";
                                                 }
 
-                                                // 2020-09-23 (Riki) Conditional statement to parse Measure Expression
+                                                // 2020-09-23 (RS) Conditional statement to parse Measure Expression
                                                 var itemTags
                                                 if(item.qMetaDef.tags[0] !== undefined){
                                                     itemTags = item.qMetaDef.tags.join(",");
@@ -253,7 +251,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                                     itemTags =  "";
                                                 }
                                                 
-                                                // 2020-09-23 (Riki) Conditional statement to parse Measure Label Expression
+                                                // 2020-09-23 (RS) Conditional statement to parse Measure Label Expression
                                                 var itemLabelExpression
                                                 if(item.qMeasure.qLabelExpression !== undefined){
                                                     itemLabelExpression = item.qMeasure.qLabelExpression.replace(/\"/g,'""');
@@ -261,7 +259,6 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                                 else{
                                                     itemLabelExpression =  "";
                                                 }
-
 
 												// 2022-04-01 (HGR) Added Format Type
                                                 var itemNumFormat
@@ -290,7 +287,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                                     itemNumFormatThou = "";
                                                 }    
 
-                                                // 2020-09-23 (Riki) Push data into list
+                                                // 2020-09-23 (RS) Push data into list
                                                 itemsFormatted.push({
                                                     Expression: `"${itemExpression}"`,
                                                     Name: `"${itemName}"`,
@@ -319,20 +316,15 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                                 }
                                             });
                                             var fileTitle = 'MeasureExport';
-                                            //console.log(itemsFormatted)
                                             exportCSVFile(headers, itemsFormatted, fileTitle); // call the exportCSVFile() function to process the JSON and trigger the download
                                             swal({
                                                 text: "Measure Master Items Exported.",
                                                 icon: "success",
                                             });
                                         });
-                                        //console.log('Formatted', itemsFormatted)
                                     })
                                 })
                             })
-
-
-
 
                         };
 
@@ -341,7 +333,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
             };
 
             const ProcessMeasures = () => {
-                // 1. Get MeasureList Object of Existing Measures
+                // 1. Set the initial property for making a request to the MeasureList endpoint.
                 new Promise((resolve,reject) => {
                     resolve(
                         enigma.app.createSessionObject({
@@ -360,7 +352,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                         })
                     );
                 })
-                // 2. Get the MeasureList Object Properties Clean
+                // 2. Get the MeasureList Object with the basic properties of all measures.
                 .then(measureList => {
                     return measureList.getLayout();
                 })					
@@ -390,7 +382,6 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                 .then(measureListPropertyItems => {
 
                         var arrayMeasures = [];
-                        //console.log(measureListPropertyItems)
                         measureListPropertyItems.forEach((element) => {
                             arrayMeasures.push({
                                 mId:   element.qInfo.qId,
@@ -404,48 +395,47 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                 // 6. Take the measures in the array and compare them to the in memory table of Measures
                 .then(arrayMeasures => {
 
+                    // Get properties from existing master measures in the app
                     var measureIdList = []
                     var measureGradientList = []
                     var measureLabelList = []
-                    arrayMeasures.forEach(function(entry) {
-                        measureIdList.push(entry.mId)
-                        measureGradientList.push(entry.mGradient)
-                        measureLabelList.push(entry.mLabel)
+                    arrayMeasures.forEach(function(element) {
+                        measureIdList.push(element.mId)
+                        measureGradientList.push(element.mGradient)
+                        measureLabelList.push(element.mLabel)
                     });
-					
-					function zip() {
-						var args = [].slice.call(arguments);
-						var shortest = args.length==0 ? [] : args.reduce(function(a,b){
-							return a.length<b.length ? a : b
-						});
-
-						return shortest.map(function(_,i){
-							return args.map(function(array){return array[i]})
-						});
+        
+                    // Get the column index of all property columns and filter out columns that do not exist in the data model.
+                    var measureHeader = measureTable.headers.filter(item => item.qCardinal !== 0)                    
+                    var headerColIndex = {}
+					for(let i=0;i<measureHeader.length;i++){
+						headerColIndex[measureHeader[i].qDimensionInfo.qFallbackTitle] = i;
 					}
 
-					// add measure formats to measure values
-					var measures = []
-                 
-                    for(var i=0;i<measurevalues.rows.length;i++){
-                    	for(var j=0;j<fmtvalues.rows.length;j++) {
-                    		if(fmtvalues.rows[j].cells[0].qText == measurevalues.rows[i].cells[6].qText) {
-                    			measures.push(measurevalues.rows[i].cells.concat(fmtvalues.rows[j].cells.slice(1)))
+                    var mTableNameIndex = headerColIndex['%MI%MeasureName'];
+                    var mTableIdIndex = headerColIndex['%MI%MeasureId'];
+
+					// Create a master array containing all properties from the data model.
+					var measureMasterTable = []
+                    for(var i=0;i<measureTable.rows.length;i++){
+                    	for(var j=0;j<measureFormatTable.rows.length;j++) {
+                    		if(measureFormatTable.rows[j].cells[0].qText == measureTable.rows[i].cells[mTableIdIndex].qText) {
+                    			measureMasterTable.push(measureTable.rows[i].cells.concat(measureFormatTable.rows[j].cells.slice(1)))
                     		}
                     	}
                     }
 
-                    measures.forEach((cells, rowno) => {			
-						// 6a. If the Measure already exists, update it instead of creating a new one
-						var mIndex = measureIdList.indexOf(cells[6].qText)							
-						if(mIndex == -1){ 
-							console.log(rowno+1 + '. Creating Measure: ' + cells[0].qText + ', Id:' + cells[6].qText)
-							$scope.CreateMeasure = CreateMeasure(cells);
+                    measureMasterTable.forEach((cells, rowno) => {			
+						// If the measure does not exist, create a new one.
+						var mArrayIdIndex = measureIdList.indexOf(cells[mTableIdIndex].qText)							
+						if(mArrayIdIndex == -1){ 
+							console.log(rowno+1 + '. Creating Measure: ' + cells[mTableNameIndex].qText + ', Id:' + cells[mTableIdIndex].qText)
+							$scope.CreateMeasure = CreateMeasure('CREATE',cells, headerColIndex);
 						} 
-						// 6b. If the Measure does not exist already, create a new one
+						// If the measure already exists, update it.
 						else {
-							console.log(rowno+1 + '. Updating Measure: ' + measureLabelList[mIndex] + ', Id:' + measureIdList[mIndex])									
-							$scope.UpdateMeasure = UpdateMeasure(cells, measureGradientList[mIndex]);
+							console.log(rowno+1 + '. Updating Measure: ' + measureLabelList[mArrayIdIndex] + ', Id:' + measureIdList[mArrayIdIndex])									
+							$scope.CreateMeasure = CreateMeasure('UPDATE',cells, headerColIndex, measureGradientList[mArrayIdIndex]);
 						}
                     });
 
@@ -461,55 +451,82 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                     // })
                 })
             }
-            const CreateMeasure =(cells) => {
+            const CreateMeasure =(actionType,cells,colIndex,gradient) => {
                 // Filter and parse EXPRESSION
+                var idx;
+                var measureName
+                idx = colIndex['%MI%MeasureName'];
+                if (typeof idx != 'undefined'){
+                    measureName = cells[idx].qText;
+                }
+                if (measureName === '-') {
+                    measureName = '';
+                }
+
+                var measureId
+                idx = colIndex['%MI%MeasureId'];
+                if (typeof idx != 'undefined'){
+                    measureId = cells[idx].qText;
+                }
+                if (measureId === '-') {
+                    measureId = '';
+                }
+
                 var expression
-                if (typeof cells[3].qText != 'undefined'){
-                    expression = cells[3].qText;
+                idx = colIndex['%MI%MeasureExpression'];
+                if (typeof idx != 'undefined'){
+                    expression = cells[idx].qText;
                 }
                 if (expression === '-') {
                     expression = '';
                 }
                 // Filter and parse LABELEXPRESSION
                 var labelExpression
-                if (typeof cells[2].qText != 'undefined'){
-                    labelExpression = cells[2].qText;
+                idx = colIndex['%MI%MeasureLabelExpression'];
+                if (typeof idx != 'undefined'){
+                    labelExpression = cells[idx].qText;
                 }
                 if (labelExpression === '-') {
                     labelExpression = '';
                 }
                 // Filter and parse COLOR
                 var color
-                if (typeof cells[5].qText != 'undefined'){
-                    color = cells[5].qText;
+                idx = colIndex['%MI%MeasureColor'];
+                if (typeof idx != 'undefined'){
+                    color = cells[idx].qText;
                 }
                 if (color === '-') {
                     color = '';
                 }
                 // Filter and parse DESCRIPTION
                 var description;
-                if (typeof cells[1].qText != 'undefined'){
-                    description = cells[1].qText;
+                idx = colIndex['%MI%MeasureDescription'];
+                if (typeof idx != 'undefined'){
+                    description = cells[idx].qText;
                 }
                 if (description === '-') {
                     description = '';
                 }
-                // Filter and parse TAGS
-                var tags = cells[4].qText;
+                // Filter and parse TAGS                
                 var tagsList = [];
-                if (typeof tags != 'undefined') {
-                    tagsList = tags.split(",");
-                    //console.log(tagsList);
-                    tagsList = tagsList.filter(a => a !== '-');
+                idx = colIndex['%MI%MeasureTags'];
+                if (typeof idx != 'undefined'){
+                    var tags = cells[idx].qText;
+                    if (typeof tags != 'undefined') {
+                        tagsList = tags.split(",");
+                        //console.log(tagsList);
+                        tagsList = tagsList.filter(a => a !== '-');
+                    }
                 }
                 tagsList.push('Master Item Manager')
                 
-                // 2020-09-09 (Riki) Filter and parse SEGMENTCOLOR                
+                // 2020-09-09 (RS) Filter and parse SEGMENTCOLOR                
                 var segmentColor
-                if (typeof cells[7] != 'undefined'){
+                idx = colIndex['%MI%MeasureSegmentColor'];
+                if (typeof idx != 'undefined'){
 					
 					// Get the segment number format from config file
-                    var segmentTypeInput = cells[8].qText.toLowerCase();
+                    var segmentTypeInput = cells[colIndex['%MI%MeasureSegmentColorFormat']].qText.toLowerCase();
                     var segmentFormat;
                     switch (true) {
                       case segmentTypeInput == 'percent':
@@ -523,9 +540,13 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                     }
                     
                     // Get the segment color list from config file, then parse the value to JSON
-                    var segmentColorList = cells[7].qText;
-                    if (segmentColorList === '-') {							
+                    var segmentColorList = cells[idx].qText;
+                    if (segmentColorList === '-') {	
+                        if (actionType === 'UPDATE') {	
+                            segmentColor = gradient 	
+                        }{				
                         segmentColor = ''
+                        }	
                     }
                     else {							
                         var arr = segmentColorList.split(',')
@@ -565,70 +586,84 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                     }
                 }
 				
-								// HGR 2022-04-01 Added Measure Format
-				if(cells.length >= 15) {
+				var numFormat={};
+
+                idx = colIndex['%MI%MeasureFormatType'];
+                if (typeof idx != 'undefined'){
+				
 					// Filter and parse FormatType
 					var formatType;
-					if (typeof cells[9].qText != 'undefined'){
-						formatType = cells[9].qText;
+					idx = colIndex['%MI%MeasureFormatType'];
+                    if (typeof idx != 'undefined'){
+						formatType = cells[idx].qText;
 					}
 					if (formatType === '-') {
 						formatType = '';
 					}
-					
+					numFormat.qType = formatType;
+
 					// Filter and parse FormatNDec
 					var formatNDec;
-					if (typeof cells[10].qText != 'undefined'){
-						formatNDec = cells[10].qText;
+					idx = colIndex['%MI%MeasureFormatNDec'];
+                    if (typeof idx != 'undefined'){
+						formatNDec = cells[idx].qText;
 					}
 					if (formatNDec === '-') {
 						formatNDec = '';
 					}
+                    numFormat.qnDec = parseInt(formatNDec);
 					
 					// Filter and parse FormatUseThou
 					var formatUseThou;
-					if (typeof cells[11].qText != 'undefined'){
-						formatUseThou = cells[11].qText;
+					idx = colIndex['%MI%MeasureFormatUseThou'];
+                    if (typeof idx != 'undefined'){
+						formatUseThou = cells[idx].qText;
 					}
 					if (formatUseThou === '-') {
 						formatUseThou = '';
 					}
+                    numFormat.qUseThou = parseInt(formatUseThou);
 					
 					// Filter and parse FormatFmt
-					var formatFmt;
-					if (typeof cells[12].qText != 'undefined'){
-						formatFmt = cells[12].qText;
+					idx = colIndex['%MI%MeasureFormatFmt'];
+                    if (typeof idx != 'undefined'){
+						formatFmt = cells[idx].qText;
 					}
 					if (formatFmt === '-') {
 						formatFmt = '';
 					}
-									
+					numFormat.qFmt = formatFmt;
+
 					// Filter and parse FormatDec
 					var formatDec;
-					if (typeof cells[13].qText != 'undefined'){
-						formatDec = cells[13].qText;
+					idx = colIndex['%MI%MeasureFormatDec'];
+                    if (typeof idx != 'undefined'){
+						formatDec = cells[idx].qText;
 					}
 					if (formatDec === '-') {
 						formatDec = '';
 					}
+                    numFormat.qDec = formatDec;
 									
 					// Filter and parse FormatThou
 					var formatThou;
-					if (typeof cells[14].qText != 'undefined'){
-						formatThou = cells[14].qText;
+					idx = colIndex['%MI%MeasureFormatThou'];
+                    if (typeof idx != 'undefined'){
+						formatThou = cells[idx].qText;
 					}
 					if (formatThou === '-') {
 						formatThou = '';
 					}
+                    numFormat.qThou = formatThou;
                 }    
                 
                 var properties = {
                     "qInfo": {
                         "qType": "measure",
-                        "qId": cells[6].qText
+                        "qId": measureId.toString()
                     },
                     "qMeasure": {
-                        "qLabel": cells[0].qText,
+                        "qLabel": measureName,
                         "qDef": expression,
                         "qGrouping": "N",
                         "qLabelExpression": labelExpression,
@@ -638,235 +673,28 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                 "color": color,
                                 "index": -1
                             },
-                            "gradient": segmentColor // 2020-09-09 (Riki) Added segment color
+                            "gradient": segmentColor 
                         },
                         "qActiveExpression": 0,
-						
-						// HGR 2022-04-01 Added Number Format
-						"qNumFormat": {
-							"qType": formatType,
-							"qnDec": parseInt(formatNDec),
-							"qUseThou": parseInt(formatUseThou),
-							"qFmt": formatFmt,
-							"qDec": formatDec,
-							"qThou": formatThou
-						}
+						"qNumFormat": numFormat
                     },
                     "qMetaDef": {
-                        "title": cells[0].qText,
-                        "description": description, // Description:
-                        "tags": tagsList, //Tags:
+                        "title": measureName,
+                        "description": description, 
+                        "tags": tagsList, 
                     }
                 };
-				
-                enigma.app.createMeasure(properties);
+
+				if (actionType === 'UPDATE') {	
+                    enigma.app.getMeasure(measureId).then(reply => {
+                        reply.setProperties(properties);
+                    });
+                } else {
+                    enigma.app.createMeasure(properties);
+                }         
+
             }
-            const UpdateMeasure = (cells, gradient) => {
-                //console.log("Updated Measures")
-                // For each element that exists in MIM Definition => Do something
-                enigma.app.getMeasure(cells[6].qText).then(reply => {
-                // Filter and parse EXPRESSION
-                var expression
-                if (typeof cells[3].qText != 'undefined'){
-                    expression = cells[3].qText;
-                }
-                if (expression === '-') {
-                    expression = '';
-                }
-                // Filter and parse LABELEXPRESSION
-                var labelExpression
-                if (typeof cells[2].qText != 'undefined'){
-                    labelExpression = cells[2].qText;
-                }
-                if (labelExpression === '-') {
-                    labelExpression = '';
-                }
-                // Filter and parse COLOR
-                var color
-                if (typeof cells[5].qText != 'undefined'){
-                    color = cells[5].qText;
-                }
-                if (color === '-') {
-                    color = '';
-                }
-                // Filter and parse DESCRIPTION
-                var description;
-                if (typeof cells[1].qText != 'undefined'){
-                    description = cells[1].qText;
-                }
-                if (description === '-') {
-                    description = '';
-                }
-                // Filter and parse TAGS
-                var tags = cells[4].qText;
-                var tagsList = [];
-                if (typeof tags != 'undefined') {
-                    tagsList = tags.split(",");
-                    //console.log(tagsList);
-                    tagsList = tagsList.filter(a => a !== '-');
-                }
-                tagsList.push('Master Item Manager')
-    
-            
-                // 2020-09-09 (Riki) Filter and parse SEGMENTCOLOR
-                var segmentColor
-                if (typeof cells[7] != 'undefined'){
-					
-					// Get the segment number format from config file
-                    var segmentTypeInput = cells[8].qText.toLowerCase();
-                    var segmentFormat;
-                    switch (true) {
-                      case segmentTypeInput == 'percent':
-                        segmentFormat = 'percent';
-                        break;
-                      case segmentTypeInput == 'fixed':
-                        segmentFormat = 'absolute';
-                        break;
-                      default:
-                        segmentFormat = 'percent';
-                    }
-                    
-                    // Get the segment color list from config file, then parse the value to JSON
-                    var segmentColorList = cells[7].qText;
-                    if (segmentColorList === '-') {							
-                        segmentColor = gradient // if no color list defined in the config file, use the old color instead
-                    }
-                    else {							
-                        var arr = segmentColorList.split(',')
 
-                        var colors=[]
-                        var limits=[]
-                        var breaks=[]
-
-                        for(let i = 0; i < arr.length; i++){
-                          var item = arr[i]
-                          var item_color = item.match('\#[A-Za-z0-9]{3,6}')[0]
-
-                          var item_index =  -1
-                          
-                          var item_limit
-                          if(segmentFormat == 'percent'){								  
-                            item_limit = +((parseFloat(item.substring(item.indexOf("|")+1,item.lastIndexOf('|')))/100).toFixed(2)).replace(/\.00$/, "")								
-                          }
-                          else{
-                            item_limit = +(parseFloat(item.substring(item.indexOf("|")+1,item.lastIndexOf('|'))))
-                          }
-
-                          var item_break = item.substring(item.lastIndexOf("|")+1).toLowerCase()
-                          var isBreakTrueSet = (item_break == 'true')
-                          
-                          colors.push({color:  item_color,index: item_index});
-        
-                          if(i<arr.length-1) {
-                              limits.push(item_limit);
-                              breaks.push(isBreakTrueSet);
-                          }
-
-                        }
-
-                        segmentColor = {colors: colors, limits: limits, breakTypes: breaks, limitType: segmentFormat};
-                    
-                    }
-                }
-				
-				// HGR 2022-04-01 Added Measure Format
-				if(cells.length >= 15) {
-					// Filter and parse FormatType
-					var formatType;
-					if (typeof cells[9].qText != 'undefined'){
-						formatType = cells[9].qText;
-					}
-					if (formatType === '-') {
-						formatType = '';
-					}
-					
-					// Filter and parse FormatNDec
-					var formatNDec;
-					if (typeof cells[10].qText != 'undefined'){
-						formatNDec = cells[10].qText;
-					}
-					if (formatNDec === '-') {
-						formatNDec = '';
-					}
-					
-					// Filter and parse FormatUseThou
-					var formatUseThou;
-					if (typeof cells[11].qText != 'undefined'){
-						formatUseThou = cells[11].qText;
-					}
-					if (formatUseThou === '-') {
-						formatUseThou = '';
-					}
-					
-					// Filter and parse FormatFmt
-					var formatFmt;
-					if (typeof cells[12].qText != 'undefined'){
-						formatFmt = cells[12].qText;
-					}
-					if (formatFmt === '-') {
-						formatFmt = '';
-					}
-									
-					// Filter and parse FormatDec
-					var formatDec;
-					if (typeof cells[13].qText != 'undefined'){
-						formatDec = cells[13].qText;
-					}
-					if (formatDec === '-') {
-						formatDec = '';
-					}
-									
-					// Filter and parse FormatThou
-					var formatThou;
-					if (typeof cells[14].qText != 'undefined'){
-						formatThou = cells[14].qText;
-					}
-					if (formatThou === '-') {
-						formatThou = '';
-					}
-                }    
-				
-				var properties = {
-                    "qInfo": {
-                        "qType": "measure",
-                        "qId": cells[6].qText
-                    },
-                    "qMeasure": {
-                        "qLabel": cells[0].qText,
-                        "qDef": expression,
-                        "qGrouping": "N",
-                        "qLabelExpression": labelExpression,
-                        "qExpressions": [],
-                        "coloring": {
-                            "baseColor": {
-                                "color": color,
-                                "index": -1
-                            },
-                            "gradient": segmentColor // 2020-09-09 (Riki) Added segment color
-                        },
-                        "qActiveExpression": 0,
-						
-						// HGR 2022-04-01 Added Number Format
-						"qNumFormat": {
-							"qType": formatType,
-							"qnDec": parseInt(formatNDec),
-							"qUseThou": parseInt(formatUseThou),
-							"qFmt": formatFmt,
-							"qDec": formatDec,
-							"qThou": formatThou
-						}
-                    },
-                    "qMetaDef": {
-                        "title": cells[0].qText,
-                        "description": description, // Description:
-                        "tags": tagsList, //Tags:
-                    }
-                };
-				
-                reply.setProperties(properties);
-                    
-                });
-            };
             const DestroyMeasure = () => {
                 // 1. Create in memory table of Measures Loaded into the MIM App
                 const table = app.createTable(['%MI%MeasureName', '%MI%MeasureDescription', '%MI%MeasureLabelExpression', '%MI%MeasureExpression', '%MI%MeasureTags', '%MI%MeasureColor','%MI%MeasureId','%MI%MeasureSegmentColor','%MI%MeasureSegmentColorFormat'], {
@@ -996,36 +824,41 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                         name: $scope.name
                     },
                     controller: ['$scope', 'luiPopover', '$element', function ($scope, luiPopover, $element) {
-                        const OpenPopover = (index, row) => {
+                        $scope.measureTable = measureTable;
+                        $scope.openPopover = function (index, row) {
                             luiPopover.show({
                                 template: measModalConfirmPopoverWindow,
                                 input: {},
                                 alignTo: document.getElementsByClassName("popover")[index], //This is the key to making the popover work and attach to the element
                                 dock: "right",
                                 controller: ['$scope', function ($scope) {
-                                    $scope.measurevalues = measurevalues;
-                                    $scope.MeasureName = row[0].qText;
-                                    $scope.MeasureDescription = row[1].qText;
-                                    $scope.MeasureLabelExpression = row[2].qText;
-                                    $scope.MeasureLabelExpressionEvaluated;
-                                    enigma.app.engineApp.evaluateEx(row[2].qText).then(reply => {
-                                        $scope.MeasureLabelExpressionEvaluated = reply.qValue.qText;
-                                    })
-                                    $scope.MeasureExpression = row[3].qText;
-                                    $scope.MeasureExpressionEvaluated;
-                                    enigma.app.engineApp.evaluateEx(row[3].qText).then(reply => {
-                                        $scope.MeasureExpressionEvaluated = reply.qValue.qText;
-                                    })
-                                    $scope.MeasureTags = row[4].qText;
-                                    $scope.MeasureColor = row[5].qText;
-
-                                    // 2020-11-01 (Riki) Added conditional statement to show measure segment color values
-                                    $scope.MeasureSegmentColor = (typeof row[7] !== 'undefined') ? row[7].qText : "-"; 
-                                    $scope.MeasureSegmentColorFormat =(typeof row[8] !== 'undefined') ? row[8].qText : "-";											
-                                    
-                                    $scope.MeasureID = row[6].qText;
-                                    //console.log($scope.MeasureID)
-        
+                                    $scope.measureTable = measureTable;
+                                    let measureHeader = measureTable.headers.filter(item => item.qCardinal !== 0)                    
+                                    let headerColIndex = {}
+                                    for(let i=0;i<measureHeader.length;i++){
+                                        headerColIndex[measureHeader[i].qDimensionInfo.qFallbackTitle] = i;
+                                    }
+                                    $scope.MeasureName = typeof headerColIndex['%MI%MeasureName'] !== 'undefined' ? row[headerColIndex['%MI%MeasureName']].qText : "-";
+                                    $scope.MeasureDescription = typeof headerColIndex['%MI%MeasureDescription'] !== 'undefined' ? row[headerColIndex['%MI%MeasureDescription']].qText : "-";
+                                    if (typeof headerColIndex['%MI%MeasureLabelExpression'] != 'undefined'){
+                                        $scope.MeasureLabelExpression = row[headerColIndex['%MI%MeasureLabelExpression']].qText;
+                                        $scope.MeasureLabelExpressionEvaluated;
+                                        enigma.app.engineApp.evaluateEx(row[headerColIndex['%MI%MeasureLabelExpression']].qText).then(reply => {
+                                            $scope.MeasureLabelExpressionEvaluated = reply.qValue.qText;
+                                        })
+                                    }
+                                    if (typeof headerColIndex['%MI%MeasureExpression'] != 'undefined'){
+                                        $scope.MeasureExpression = row[headerColIndex['%MI%MeasureExpression']].qText;
+                                        $scope.MeasureExpressionEvaluated;
+                                        enigma.app.engineApp.evaluateEx(row[headerColIndex['%MI%MeasureExpression']].qText).then(reply => {
+                                            $scope.MeasureExpressionEvaluated = reply.qValue.qText;
+                                        })
+                                    }
+                                    $scope.MeasureTags = typeof headerColIndex['%MI%MeasureTags'] !== 'undefined' ? row[headerColIndex['%MI%MeasureTags']].qText : "-";
+                                    $scope.MeasureColor = typeof headerColIndex['%MI%MeasureColor'] !== 'undefined' ? row[headerColIndex['%MI%MeasureColor']].qText : "-";
+                                    $scope.MeasureSegmentColor = typeof headerColIndex['%MI%MeasureSegmentColor'] !== 'undefined' ? row[headerColIndex['%MI%MeasureSegmentColor']].qText : "-";
+                                    $scope.MeasureSegmentColorFormat = typeof headerColIndex['%MI%MeasureSegmentColorFormat'] !== 'undefined' ? row[headerColIndex['%MI%MeasureSegmentColorFormat']].qText : "-";								
+                                    $scope.MeasureID = typeof headerColIndex['%MI%MeasureId'] !== 'undefined' ? row[headerColIndex['%MI%MeasureId']].qText : "-";
                                     $scope.SelectValue = function () {
                                         app.field('%MI%MeasureId').toggleSelect($scope.MeasureID, true);
                                         $scope.close();
@@ -1033,17 +866,11 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                     $scope.SelectAlternative = function () {
                                         app.field('%MI%MeasureId').selectAlternative();
                                     }
-                                    //app.field('%MI%MeasureId').toggleSelect($scope.MeasureID, true);
                                 }]
                             });
                         };
                         // Get a Selectable List from the qlik selection based on fields
-                        $scope.measurevalues = measurevalues;
-
-                        $scope.OpenPopover = OpenPopover;
-
                         $scope.selState = app.selectionState();
-                        
                     }]
                 });
             };
@@ -1218,7 +1045,6 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                         // Get a Selectable List from the qlik selection based on fields
                         //var arrayDimensions = [];
                         var arrayMeasures = [];
-                        
                         $scope.dimensionvalues = dimensionvalues;
                         $scope.openPopover = function (index, row) {
                             luiPopover.show({
@@ -1229,22 +1055,31 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                 controller: ['$scope', function ($scope) {
                                     //console.log(enigma.app.engineApp);
                                     $scope.dimensionvalues = dimensionvalues;
-                                    $scope.DimensionName = row[0].qText;
-                                    $scope.DimensionDescription = row[3].qText;
-                                    $scope.DimensionDescriptionEvaluated;
-                                    enigma.app.engineApp.expandExpression(row[3].qText).then(reply => {
-                                        $scope.DimensionDescriptionEvaluated = reply.qExpandedExpression;
-                                        //console.log(reply);
-                                    })
-                                    $scope.DimensionLabelExpression = row[2].qText;
-                                    $scope.DimensionLabelExpressionEvaluated;
-                                    enigma.app.engineApp.evaluateEx(row[2].qText).then(reply => {
-                                        $scope.DimensionLabelExpressionEvaluated = reply.qValue.qText
-                                    })
-                                    $scope.DimensionField = row[1].qText;
-                                    $scope.DimensionTags = row[5].qText;
-                                    $scope.DimensionColor = row[4].qText;
-                                    $scope.DimensionID = row[6].qText;
+                                    var dimensionHeader = dimensionvalues.headers.filter(item => typeof item.errorCode == 'undefined')                  
+                                    var headerColIndex = {}
+                                    for(let i=0;i<dimensionHeader.length;i++){
+                                        headerColIndex[dimensionHeader[i].qDimensionInfo.qFallbackTitle] = i;
+                                    }
+
+                                    $scope.DimensionName = typeof headerColIndex['%MI%DimensionName'] !== 'undefined' ? row[headerColIndex['%MI%DimensionName']].qText : "-";
+                                    if (typeof headerColIndex['%MI%DimensionDescription'] != 'undefined'){
+                                        $scope.DimensionDescription = row[headerColIndex['%MI%DimensionDescription']].qText;
+                                        $scope.DimensionDescriptionEvaluated;
+                                        enigma.app.engineApp.expandExpression(row[headerColIndex['%MI%DimensionDescription']].qText).then(reply => {
+                                            $scope.DimensionDescriptionEvaluated = reply.qExpandedExpression;
+                                        })
+                                    }
+                                    if (typeof headerColIndex['%MI%DimensionLabelExpression'] != 'undefined'){
+                                        $scope.DimensionLabelExpression = row[headerColIndex['%MI%DimensionLabelExpression']].qText;
+                                        $scope.DimensionLabelExpressionEvaluated;
+                                        enigma.app.engineApp.evaluateEx(row[headerColIndex['%MI%DimensionLabelExpression']].qText).then(reply => {
+                                            $scope.DimensionLabelExpressionEvaluated = reply.qValue.qText;
+                                        })
+                                    }
+                                    $scope.DimensionField = typeof headerColIndex['%MI%DimensionField'] !== 'undefined' ? row[headerColIndex['%MI%DimensionField']].qText : "-";
+                                    $scope.DimensionTags = typeof headerColIndex['%MI%DimensionTags'] !== 'undefined' ? row[headerColIndex['%MI%DimensionTags']].qText : "-";                 
+                                    $scope.DimensionColor = typeof headerColIndex['%MI%DimensionColor'] !== 'undefined' ? row[headerColIndex['%MI%DimensionColor']].qText : "-";
+                                    $scope.DimensionID = typeof headerColIndex['%MI%DimensionId'] !== 'undefined' ? row[headerColIndex['%MI%DimensionId']].qText : "-";
                                     //console.log($scope);
                                     $scope.SelectValue = function () {
                                         app.field('%MI%DimensionId').toggleSelect($scope.DimensionID, true);
@@ -1293,7 +1128,6 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                 // 3. Push the Measures in the MeasureList Object to an Array
                 .then(dimensionListProperties => {
                     var arrayDimensions = [];
-                    //console.log(dimensionListProperties);
                     dimensionListProperties.qDimensionList.qItems.forEach((element) => {
                         arrayDimensions.push(element.qInfo.qId)
                     });
@@ -1301,18 +1135,29 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                 })
                 // 4. Take the measures in the array and compare them to the in memory table of Measures
                 .then(arrayDimensions => {
-                    //console.log(measurevalues);
+                    // Get the column index of all property columns and filter out columns that do not exist in the data model.
+                    var dimensionHeader = dimensionvalues.headers.filter(item => typeof item.errorCode == 'undefined')                  
+                    var headerColIndex = {}
+                    for(let i=0;i<dimensionHeader.length;i++){
+                        headerColIndex[dimensionHeader[i].qDimensionInfo.qFallbackTitle] = i;
+                    }
+
+                    var mTableNameIndex = headerColIndex['%MI%DimensionName'];
+                    var mTableIdIndex = headerColIndex['%MI%DimensionId'];
+
+
                     dimensionvalues.rows.forEach((row, rowno) => {
-                        //console.log(row);
-                        // 4a. If the Dimension does not already exist create it
-                        if(!arrayDimensions.includes(row.cells[6].qText)){
-                            console.log(rowno+1 + '. Creating Dimension, ID: ' + row.cells[6].qText);
-                            $scope.CreateDimension = CreateDimension(row);
+                        var mArrayIdIndex = arrayDimensions.indexOf(row.cells[mTableIdIndex].qText);	
+					
+						// 4a. If the Dimension does not already exist create it
+                        if(mArrayIdIndex == -1){ 
+                            console.log(rowno+1 + '. Creating Dimension, ID: ' + row.cells[mTableIdIndex].qText);
+                            $scope.CreateDimension = CreateDimension('CREATE', row, headerColIndex);
                         } 
                         // 4b. If the Dimension does already exist, update
                         else {
-                            console.log(rowno+1 + '. Updating Dimension, ID: ' + row.cells[6].qText);
-                            $scope.UpdateDimension = UpdateDimension(row);
+                            console.log(rowno+1 + '. Updating Dimension, ID: ' + row.cells[mTableIdIndex].qText);
+                            $scope.CreateDimension = CreateDimension('UPDATE', row, headerColIndex);
                         }
                     });
 
@@ -1325,7 +1170,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                 })
             };
             // Create Dimensions
-            const CreateDimension =(row) => {
+            const CreateDimension =(actionType, row,colIndex) => {
             
             /* 
             var dimensionfields = row.cells[1].qText.split(",").map(item => {
@@ -1333,43 +1178,69 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
             });
             */
 
-            // 2020-12-02 (Riki/MarredCheese) Fix importing expression-based dimensions
-            var qText = row.cells[1].qText;
+            // 2020-12-02 (RS/MarredCheese) Fix importing expression-based dimensions
+            var idx;
+
+            idx = colIndex['%MI%DimensionName'];
+            var dimensionName;
+            if (typeof idx != 'undefined'){
+                dimensionName = row.cells[idx].qText;
+            }
+            if (dimensionName === '-') {
+                dimensionName = '';
+            }
+
+            idx = colIndex['%MI%DimensionId'];
+            var dimensionId;
+            if (typeof idx != 'undefined'){
+                dimensionId = row.cells[idx].qText;
+            }
+            if (dimensionId === '-') {
+                dimensionId = '';
+            }
+
+            idx = colIndex['%MI%DimensionField'];
             var dimensionfields;
-            if (qText.startsWith('='))  // expression
-                dimensionfields = [qText.trim()];
+            if (typeof idx != 'undefined'){
+                dimensionfields = row.cells[idx].qText;
+            }
+            if (dimensionfields.startsWith('='))  // expression
+                dimensionfields = [dimensionfields.trim()];
             else {  // single field or drill-down field list
-                dimensionfields = qText.split(",").map(item => {
+                dimensionfields = dimensionfields.split(",").map(item => {
                     return item.trim();
                 });
             }
 
-
+            idx = colIndex['%MI%DimensionLabelExpression'];
             var labelExpression;
-            if (typeof row.cells[2].qText != 'undefined'){
-                labelExpression = row.cells[2].qText;
+            if (typeof idx != 'undefined'){
+                labelExpression = row.cells[idx].qText;
             }
             if (labelExpression === '-') {
                 labelExpression = '';
             }
 
+            idx = colIndex['%MI%DimensionDescription'];
             var description;
-            if (typeof row.cells[3].qText != 'undefined'){
-                description = row.cells[3].qText;
+            if (typeof idx != 'undefined'){
+                description = row.cells[idx].qText;
             }
             if (description === '-') {
                 description = '';
             }
 
+            idx = colIndex['%MI%DimensionColor'];
             var color;
-            if (typeof row.cells[4].qText != 'undefined'){
-                color = row.cells[4].qText;
+            if (typeof idx != 'undefined'){
+                color = row.cells[idx].qText;
             }
             if (color === '-') {
                 color = '';
             }
 
-            var tags = row.cells[5].qText;
+            idx = colIndex['%MI%DimensionTags'];
+            var tags = row.cells[idx].qText;
             var tagsList = [];
             if (typeof tags != 'undefined') {
                 tagsList = tags.split(",");
@@ -1386,126 +1257,47 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
 
                 // Filter and parse TAGS
 
-                tagsList.push('Master Item Manager')
-                enigma.app.createDimension({
-                    "qInfo": {
-                        "qType": "dimension",
-                        "qId": row.cells[6].qText
-                    },
-                    "qDim": {
-                        //	"title": "something",
-                        "qGrouping": qGrouping,
-                        "qLabelExpression": labelExpression,
-                        "qFieldDefs": dimensionfields,
-                        //"qFieldLabels": ["TEST"],
-                        "title": row.cells[0].qText,
-                        "coloring": {
-                            "baseColor": {
-                                "color": color, // Dimension Color:
-                                "index": -1
-                            },
+            tagsList.push('Master Item Manager')
+
+            var properties = {
+                "qInfo": {
+                    "qType": "dimension",
+                    "qId": dimensionId
+                },
+                "qDim": {
+                    //	"title": "something",
+                    "qGrouping": qGrouping,
+                    "qLabelExpression": labelExpression,
+                    "qFieldDefs": dimensionfields,
+                    //"qFieldLabels": ["TEST"],
+                    "title": dimensionName,
+                    "coloring": {
+                        "baseColor": {
+                            "color": color, // Dimension Color:
+                            "index": -1
                         },
                     },
-                    "qMetaDef": {
-                        "title": row.cells[0].qText, //Dimension Name
-                        "description": description, //Desciption:
-                        "tags": tagsList, //Tags
-                    }
+                },
+                "qMetaDef": {
+                    "title": dimensionName, //Dimension Name
+                    "description": description, //Desciption:
+                    "tags": tagsList, //Tags
+                }
+            }
+
+
+
+            if (actionType === 'UPDATE') {	
+                enigma.app.getDimension(dimensionId).then(reply => {
+                    reply.setProperties(properties);
                 });
+            } else {
+                enigma.app.createDimension(properties);
+            }         
+
+
             };
-            // Update Dimension
-            const UpdateDimension = (row) => {
-                // For each element that exists in MIM Definition => Do something
-                /*
-                var dimensionfields = row.cells[1].qText.split(",").map(item => {
-                    return item.trim();
-                });
-                */
-               
-                // 2020-12-02 (Riki/MarredCheese) Fix importing expression-based dimensions
-                var qText = row.cells[1].qText;
-                var dimensionfields;
-                if (qText.startsWith('='))  // expression
-                    dimensionfields = [qText.trim()];
-                else {  // single field or drill-down field list
-                    dimensionfields = qText.split(",").map(item => {
-                        return item.trim();
-                    });
-                }
 
-
-                var labelExpression;
-                if (typeof row.cells[2].qText != 'undefined'){
-                    labelExpression = row.cells[2].qText;
-                }
-                if (labelExpression === '-') {
-                    labelExpression = '';
-                }
-
-                var description;
-                if (typeof row.cells[3].qText != 'undefined'){
-                    description = row.cells[3].qText;
-                }
-                if (description === '-') {
-                    description = '';
-                }
-
-                var color;
-                if (typeof row.cells[4].qText != 'undefined'){
-                    color = row.cells[4].qText;
-                }
-                if (color === '-') {
-                    color = '';
-                }
-
-                var tags = row.cells[5].qText;
-                var tagsList = [];
-                if (typeof tags != 'undefined') {
-                    tagsList = tags.split(",");
-                    //console.log(tagsList);
-                    tagsList = tagsList.filter(a => a !== '-');
-                }
-
-                var qGrouping;
-                if (dimensionfields.length > 1) {
-                    qGrouping = "H"
-                } else {
-                    qGrouping = "N"
-                };
-
-                // Filter and parse TAGS
-
-                tagsList.push('Master Item Manager');
-
-                enigma.app.getDimension(row.cells[6].qText).then(reply => {
-                    reply.setProperties({
-                        "qInfo": {
-                            "qType": "dimension",
-                            "qId": row.cells[6].qText
-                        },
-                        "qDim": {
-                            //	"title": "something",
-                            "qGrouping": qGrouping,
-                            "qLabelExpression": labelExpression,
-                            "qFieldDefs": dimensionfields,
-                            //"qFieldLabels": ["TEST"],
-                            "title": row.cells[0].qText,
-                            "coloring": {
-                                "baseColor": {
-                                    "color": color, // Dimension Color:
-                                    "index": -1
-                                },
-                            },
-                        },
-                        "qMetaDef": {
-                            "title": row.cells[0].qText, //Dimension Name
-                            "description": description, //Desciption:
-                            "tags": tagsList, //Tags
-                        }
-                    })
-                })
-    
-            };
             // Destroy Dimension
             const DestroyDimension = () => {
                 // 1. Create in memory table of Dimensions Loaded into the MIM App
