@@ -58,17 +58,15 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
              ***************************************************/
 
             // Set header for Qlik table containing all measure properties from the config data.
+            // 2023-03-30 (RS) Reordered the column to fix the issue with displaying the measure in the modal window.
             var measureTable = app.createTable([
+                  '%MI%MeasureId'
                 , '%MI%MeasureName'
                 , '%MI%MeasureDescription'
                 , '%MI%MeasureLabelExpression'
                 , '%MI%MeasureExpression'
                 , '%MI%MeasureTags'
                 , '%MI%MeasureColor'
-                , '%MI%MeasureSegmentColor'
-                , '%MI%MeasureSegmentColorFormat'
-                , '%MI%MeasureId'
-            
             ], {
                 rows: 1000
             });
@@ -77,6 +75,8 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
             // so we need to create another table to store the remaining properties.
 			var measureFormatTable = app.createTable([       
                   '%MI%MeasureId'         
+                , '%MI%MeasureSegmentColor'
+                , '%MI%MeasureSegmentColorFormat'
                 , '%MI%MeasureFormatType'
                 , '%MI%MeasureFormatNDec'
                 , '%MI%MeasureFormatUseThou'
@@ -833,7 +833,8 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                 dock: "right",
                                 controller: ['$scope', function ($scope) {
                                     $scope.measureTable = measureTable;
-                                    let measureHeader = measureTable.headers.filter(item => item.qCardinal !== 0)                    
+                                    //let measureHeader = measureTable.headers.filter(item => item.qCardinal !== 0)   
+                                    let measureHeader = measureTable.rows[index].cells; // 2023-03-30 (RS) Get headers from the cell instead of 'headers' due to some missing values in the 'headers' section              
                                     let headerColIndex = {}
                                     for(let i=0;i<measureHeader.length;i++){
                                         headerColIndex[measureHeader[i].qDimensionInfo.qFallbackTitle] = i;
