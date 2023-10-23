@@ -57,35 +57,32 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
              * 												   *
              ***************************************************/
 
-            // Set header for Qlik table containing all measure properties from the config data.
-            var measureTable = app.createTable([
-                , '%MI%MeasureName'
-                , '%MI%MeasureDescription'
-                , '%MI%MeasureLabelExpression'
-                , '%MI%MeasureExpression'
-                , '%MI%MeasureTags'
-                , '%MI%MeasureColor'
-                , '%MI%MeasureSegmentColor'
-                , '%MI%MeasureSegmentColorFormat'
-                , '%MI%MeasureId'
-            
-            ], {
-                rows: 1000
-            });
+			// Create a Qlik table to store measure properties from the config data.
+			var measureTable = app.createTable([
+				'%MI%MeasureId',
+				'%MI%MeasureName',
+				'%MI%MeasureDescription',
+				'%MI%MeasureLabelExpression',
+				'%MI%MeasureExpression',
+				'%MI%MeasureTags',
+				'%MI%MeasureColor',
+				'%MI%MeasureSegmentColor',
+				'%MI%MeasureSegmentColorFormat'
+			], {
+				rows: 1000
+			});
 
-            // Qlik Table does not allow us to create a table with more than 10 columns, 
-            // so we need to create another table to store the remaining properties.
-			var measureFormatTable = app.createTable([       
-                  '%MI%MeasureId'         
-                , '%MI%MeasureFormatType'
-                , '%MI%MeasureFormatNDec'
-                , '%MI%MeasureFormatUseThou'
-                , '%MI%MeasureFormatFmt'
-                , '%MI%MeasureFormatDec'
-                , '%MI%MeasureFormatThou' 
-            ], {
-                rows: 1000
-            });
+			// Due to Qlik Table limitations restricting the number of rows in memory table
+			// create a separate table to store the remaining measure format properties.
+			var measureFormatTable = app.createTable([
+				'%MI%MeasureId',
+				'%MI%MeasureFormatType',
+				'%MI%MeasureFormatFmt',
+				'%MI%MeasureFormatDec',
+				'%MI%MeasureFormatThou'
+			], {
+				rows: 1000
+			});
 
             // Menu option for changing MEASURES
             $scope.openMeasModalMain = function () {
@@ -141,7 +138,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                         const itemsNotFormatted = Promise.all(testArray);
                                         //console.log(itemsNotFormatted)
 
-                                        var headers = {
+                                        var csvHeaders = {
                                             Expression: "%MI%MeasureExpression", // remove commas to avoid errors
                                             Name: "%MI%MeasureName",
                                             LabelExpression: "%MI%MeasureLabelExpression",
@@ -152,176 +149,103 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                             SegmentColorFormat: "%MI%MeasureSegmentColorFormat", // 2020-09-09 (RS) Added SegmentColor Format
                                             ID: "%MI%MeasureId",
 											FormatType: "%MI%MeasureFormatType", // 2022-04-01 (HGR) Added Format Type
-											FormatNDec: "%MI%MeasureFormatNDec", // 2022-04-01 (HGR) Added Format Type
-                                            FormatUseThou: "%MI%MeasureFormatUseThou", // 2022-04-01 (HGR) Added Format Type
                                             FormatFmt: "%MI%MeasureFormatFmt", // 2022-04-01 (HGR) Added Format Type
                                             FormatDec: "%MI%MeasureFormatDec", // 2022-04-01 (HGR) Added Format Type
                                             FormatThou: "%MI%MeasureFormatThou" // 2022-04-01 (HGR) Added Format Type
                                         };
 
 
-                                        // console.log('Unformatted', itemsNotFormatted)
-                                        var itemsFormatted = [];
 
-                                        // format the data
-                                        itemsNotFormatted.then((item) => {
-                                            item.map(item => {
+										// Initialize an empty array to store the formatted items.
+										const itemsFormatted = [];
 
-                                               // 2020-09-23 (RS) Parse measure name & id
-                                               var itemName = item.qMeasure.qLabel;
-                                               var itemID = item.qInfo.qId;
+										// Perform operations on itemsNotFormatted.
+										itemsNotFormatted
+											.then((items) => Promise.all(items.map((item) => {
+												// Extract relevant properties from the item.
+												// Sanitize and format the data where necessary.
+												// Collect the extracted data into a new object.
+												const {
+													qMeasure,
+													qInfo: {
+														qId: itemID
+													},
+													qMetaDef: {
+														description: itemDescription,
+														tags: itemTags
+													},
+												} = item;
+												
+												const itemName = qMeasure.qLabel;
+												const itemExpression = (qMeasure.qDef || '').replace(/"/g, '""');
+												const itemLabelExpression = (qMeasure.qLabelExpression || '').replace(/"/g, '""');
+												const itemBaseColor = (qMeasure.coloring.baseColor?.color || '');
+												const segmentColorItem = qMeasure.coloring.gradient || {};
+												const segmentColorLimitType = segmentColorItem.limitType === 'absolute' ? 'fixed' : 'percent';
 
-                                                // 2020-09-09 (RS) Parse and convert segment color json to comma separated string for exporting
-                                               var segmentColorFormatted
-                                               var segmentColorLimitType
-                                                if (item.qMeasure.coloring.gradient !== undefined && item.qMeasure.coloring.gradient != '') {
-                                                    
-                                                    // Get segment color json data
-                                                    var segmentColorItem = item.qMeasure.coloring.gradient;
-                                                    var segmentColorFormatted=[];
+												const colors = segmentColorItem.colors || [];
+												const limits = segmentColorItem.limits || [];
+												const breaks = segmentColorItem.breakTypes || [];
 
-                                                    var colors = segmentColorItem.colors;  
-                                                    var limits = segmentColorItem.limits;
-                                                    var breaks = segmentColorItem.breakTypes;	
+												const segmentColorFormatted = colors
+													.map((color, i) => {
+														const limit = segmentColorLimitType === 'fixed' ? limits[i] : (limits[i] * 100).toFixed(2).replace(/\.00$/, '');
+														return `${color.color}|${limit}|${breaks[i]}`;
+													})
+													.join(',');
 
-                                                    // Get segment color limit number type
-                                                    segmentColorLimitType = segmentColorItem.limitType	
-                                                    if(segmentColorLimitType == 'absolute'){
-                                                        segmentColorLimitType = 'fixed';
-                                                    }
+												const {
+													qType: itemNumFormatType = '',
+													qFmt: itemNumFormatFmt = '',
+													qDec: itemNumFormatDec = '',
+													qThou: itemNumFormatThou = '',
+												} = qMeasure.qNumFormat || {};
 
-                                                    // Append color code, limit value and gradient to list
-                                                    for(let i = 0; i < colors.length; i++){
-                                                      if(i<colors.length-1) {
-														if(segmentColorLimitType=='fixed') {
-															segmentColorFormatted.push(colors[i].color + '|' +  limits[i] + '|' + breaks [i])
+												return {
+													// Formatted item properties
+													Expression: `"${itemExpression}"`,
+													Name: `"${itemName}"`,
+													LabelExpression: `"${itemLabelExpression}"`,
+													Description: `"${itemDescription.replace(/"/g, '""')}"`,
+													Color: `"${itemBaseColor}"`,
+													Tags: `"${itemTags?.join(',') || ''}"`,
+													SegmentColor: `"${segmentColorFormatted}"`,
+													SegmentColorFormat: `"${segmentColorLimitType}"`,
+													ID: `"${itemID}"`,
+													FormatType: `"${itemNumFormatType}"`,
+													FormatFmt: `"${itemNumFormatFmt}"`,
+													FormatDec: `"${itemNumFormatDec}"`,
+													FormatThou: `"${itemNumFormatThou}"`,
+												};
+
+												
+											})))
+											.then((formattedItems) => {
+												// Append the formatted items to the itemsFormatted array.
+												itemsFormatted.push(...formattedItems);
+												
+												// Loop through each formatted item and set undefined properties to "=''".
+												itemsFormatted.forEach((obj) => {
+													for (const prop in obj) {
+														if (obj[prop] === undefined) {
+															obj[prop] = "=''";
 														}
-                                                        else{
-															segmentColorFormatted.push(colors[i].color + '|' +  (limits[i]*100).toFixed(2).replace(/\.00$/, "") + '|' + breaks [i])
-														}
-                                                      }
-                                                      else {
-                                                        segmentColorFormatted.push(colors[i].color)
-                                                      }
-                                                    }
-                                                    
-                                                    // Join color code list into comma separated string
-                                                    segmentColorFormatted = segmentColorFormatted.join(",");
-                                                    
-                                                }	
-                                                else {
-                                                    segmentColorFormatted = "";
-                                                    segmentColorLimitType = "";
+													}
+												});
 
-                                                }													
-                                            
-                                                // 2020-09-09 (RS) Conditional statement to parse Measure description with expression
-                                                var itemDescription;
-                                                if(item.qMeasure.descriptionExpression !== undefined){
-                                                    itemDescription = item.qMeasure.descriptionExpression.qStringExpression.qExpr.replace(/\"/g,'""');
-                                                }
-                                                else{
-                                                    itemDescription = item.qMetaDef.description.replace(/\"/g,'""');
-                                                }
-                                                
-                                                // 2020-09-23 (RS) Conditional statement to parse Measure base color
-                                                var itemBaseColor;
-                                                if(item.qMeasure.coloring.baseColor !== undefined){
-                                                    itemBaseColor = item.qMeasure.coloring.baseColor.color;
-                                                }
-                                                else{
-                                                    itemBaseColor =  "";
-                                                }
+												// Define the title for the CSV file.
+												const fileTitle = 'MeasureExport';
 
-                                                // 2020-09-23 (RS) Conditional statement to parse Measure Expression
-                                                var itemExpression
-                                                if(item.qMeasure.qDef !== undefined){
-                                                    itemExpression = item.qMeasure.qDef.replace(/\"/g,'""');
-                                                }
-                                                else{
-                                                    itemExpression =  "";
-                                                }
+												// Export the formatted data to a CSV file and display a success message.
+												exportCSVFile(csvHeaders, itemsFormatted, fileTitle);
+												swal({
+													text: "Measure Master Items Exported.",
+													icon: "success",
+												});
+											});
 
-                                                // 2020-09-23 (RS) Conditional statement to parse Measure Expression
-                                                var itemTags
-                                                if(item.qMetaDef.tags[0] !== undefined){
-                                                    itemTags = item.qMetaDef.tags.join(",");
-                                                }
-                                                else{
-                                                    itemTags =  "";
-                                                }
-                                                
-                                                // 2020-09-23 (RS) Conditional statement to parse Measure Label Expression
-                                                var itemLabelExpression
-                                                if(item.qMeasure.qLabelExpression !== undefined){
-                                                    itemLabelExpression = item.qMeasure.qLabelExpression.replace(/\"/g,'""');
-                                                }
-                                                else{
-                                                    itemLabelExpression =  "";
-                                                }
 
-												// 2022-04-01 (HGR) Added Format Type
-                                                var itemNumFormat
-                                                var itemNumFormatType
-												var itemNumFormatNDec
-                                                var itemNumFormatUseThou
-                                                var itemNumFormatFmt
-                                                var itemNumFormatDec
-                                                var itemNumFormatThou       
-                                                if(item.qMeasure.qNumFormat !== undefined){
-                                                    itemNumFormat = item.qMeasure.qNumFormat;
-                                                    itemNumFormatType = itemNumFormat.qType;
-													itemNumFormatNDec = itemNumFormat.qnDec;
-                                                    itemNumFormatUseThou = itemNumFormat.qUseThou;
-                                                    itemNumFormatFmt = itemNumFormat.qFmt;                                                    
-													itemNumFormatDec = itemNumFormat.qDec;
-                                                    itemNumFormatThou = itemNumFormat.qThou;
-                                                }
-                                                else{
-                                                    itemNumFormat =  "";
-                                                    itemNumFormatType = "";
-													itemNumFormatNDec = 1;
-                                                    itemNumFormatUseThou = 1;
-                                                    itemNumFormatFmt = "";
-                                                    itemNumFormatDec = "";
-                                                    itemNumFormatThou = "";
-                                                }    
 
-                                                // 2020-09-23 (RS) Push data into list
-                                                itemsFormatted.push({
-                                                    Expression: `"${itemExpression}"`,
-                                                    Name: `"${itemName}"`,
-                                                    LabelExpression: `"${itemLabelExpression}"`,
-                                                    Description: `"${itemDescription}"`,
-                                                    Color: `"${itemBaseColor}"`,
-                                                    Tags: `"${itemTags}"`,
-                                                    SegmentColor: `"${segmentColorFormatted}"`,
-                                                    SegmentColorFormat: `"${segmentColorLimitType}"`, 
-                                                    ID: `"${itemID}"`,
-                                                    FormatType: `"${itemNumFormatType}"`,
-													FormatNDec: `"${itemNumFormatNDec}"`,
-                                                    FormatUseThou: `"${itemNumFormatUseThou}"`,
-                                                    FormatFmt: `"${itemNumFormatFmt}"`,
-                                                    FormatDec: `"${itemNumFormatDec}"`,
-                                                    FormatThou: `"${itemNumFormatThou}"`,
-                                                }); 
-                                            })
-
-                                        }).then(element => {
-                                            itemsFormatted.forEach(function (obj) {
-                                                for (var i in obj) {
-                                                    if (obj[i] === undefined) {
-                                                        obj[i] = "=''";
-                                                    }
-                                                }
-                                            });
-                                            var fileTitle = 'MeasureExport';
-                                            exportCSVFile(headers, itemsFormatted, fileTitle); // call the exportCSVFile() function to process the JSON and trigger the download
-                                            swal({
-                                                text: "Measure Master Items Exported.",
-                                                icon: "success",
-                                            });
-                                        });
                                     })
                                 })
                             })
@@ -332,368 +256,268 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                 });
             };
 
-            const ProcessMeasures = () => {
-                // 1. Set the initial property for making a request to the MeasureList endpoint.
-                new Promise((resolve,reject) => {
-                    resolve(
-                        enigma.app.createSessionObject({
-                            "qProp": {
-                                "qInfo": {
-                                    "qType": "MeasureList"
-                                },
-                                "qMeasureListDef": {
-                                    "qType": "measure",
-                                    "qData": {
-                                        "title": "/title",
-                                        "tags": "/tags"
-                                    }
-                                }
-                            }
-                        })
-                    );
-                })
-                // 2. Get the MeasureList Object with the basic properties of all measures.
-                .then(measureList => {
-                    return measureList.getLayout();
-                })					
-                // 3. Get the MeasureList Info
-                .then(measureListInfo => {					
-                    
-                    // List of Measures (base form);
-                    const measDef = measureListInfo.qMeasureList.qItems.map(async element => {
-                        const response = enigma.app.getMeasure(element.qInfo.qId);
-                        return response;
-                    })                    
-					return Promise.all(measDef);
-					
-                })
-                // 4. Get the MeasureList Properties
-                .then(measureListProperties => {
-
-                    const testArray = measureListProperties.map(element => {
-                        const response = element.getProperties();
-                        return response;
-                    })
-
-                    return Promise.all(testArray);			
-                   
-				})  
-				// 5. Push the Measures in the MeasureList Properties Object to an Array              
-                .then(measureListPropertyItems => {
-
-                        var arrayMeasures = [];
-                        measureListPropertyItems.forEach((element) => {
-                            arrayMeasures.push({
-                                mId:   element.qInfo.qId,
-                                mLabel: element.qMeasure.qLabel,
-                                mGradient: element.qMeasure.coloring.gradient
-                            });
-                        });                                                                    
-                        return arrayMeasures;
-                    
-                })   
-                // 6. Take the measures in the array and compare them to the in memory table of Measures
-                .then(arrayMeasures => {
-
-                    // Get properties from existing master measures in the app
-                    var measureIdList = []
-                    var measureGradientList = []
-                    var measureLabelList = []
-                    arrayMeasures.forEach(function(element) {
-                        measureIdList.push(element.mId)
-                        measureGradientList.push(element.mGradient)
-                        measureLabelList.push(element.mLabel)
-                    });
-        
-                    // Get the column index of all property columns and filter out columns that do not exist in the data model.
-                    var measureHeader = measureTable.headers.filter(item => item.qCardinal !== 0)                    
-                    var headerColIndex = {}
-					for(let i=0;i<measureHeader.length;i++){
-						headerColIndex[measureHeader[i].qDimensionInfo.qFallbackTitle] = i;
-					}
-
-                    var mTableNameIndex = headerColIndex['%MI%MeasureName'];
-                    var mTableIdIndex = headerColIndex['%MI%MeasureId'];
-
-					// Create a master array containing all properties from the data model.
-					var measureMasterTable = []
-                    for(var i=0;i<measureTable.rows.length;i++){
-                    	for(var j=0;j<measureFormatTable.rows.length;j++) {
-                    		if(measureFormatTable.rows[j].cells[0].qText == measureTable.rows[i].cells[mTableIdIndex].qText) {
-                    			measureMasterTable.push(measureTable.rows[i].cells.concat(measureFormatTable.rows[j].cells.slice(1)))
-                    		}
-                    	}
-                    }
-
-                    measureMasterTable.forEach((cells, rowno) => {			
-						// If the measure does not exist, create a new one.
-						var mArrayIdIndex = measureIdList.indexOf(cells[mTableIdIndex].qText)							
-						if(mArrayIdIndex == -1){ 
-							console.log(rowno+1 + '. Creating Measure: ' + cells[mTableNameIndex].qText + ', Id:' + cells[mTableIdIndex].qText)
-							$scope.CreateMeasure = CreateMeasure('CREATE',cells, headerColIndex);
-						} 
-						// If the measure already exists, update it.
-						else {
-							console.log(rowno+1 + '. Updating Measure: ' + measureLabelList[mArrayIdIndex] + ', Id:' + measureIdList[mArrayIdIndex])									
-							$scope.CreateMeasure = CreateMeasure('UPDATE',cells, headerColIndex, measureGradientList[mArrayIdIndex]);
+			// Retrieves a specific attribute value from an array of Measure objects based on a key attribute.
+			function getValueByKey(objAttribute, keyAttribute, valueAttribute) {
+				for (let i = 0; i < objAttribute.length; i++) {
+					const obj = objAttribute[i];
+					if (obj.qDimensionInfo && obj.qDimensionInfo.qFallbackTitle === keyAttribute || obj.id === keyAttribute) {
+						// Retrieve the value of the specified attribute and handle '-' as an empty string.	
+						var objValue = obj[valueAttribute];
+						if (objValue === '-') {
+							objValue = '';
 						}
-                    });
-
-                })
-                .then(() => {
-                    swal({
-                        text: "Measures Created",
-                        icon: "success"
-                    });
-                    // swal({
-                    // 	text: "Found Existing Measures. Synchronizing...",
-                    // 	icon: "warning"
-                    // })
-                })
-            }
-            const CreateMeasure =(actionType,cells,colIndex,gradient) => {
-                // Filter and parse EXPRESSION
-                var idx;
-                var measureName
-                idx = colIndex['%MI%MeasureName'];
-                if (typeof idx != 'undefined'){
-                    measureName = cells[idx].qText;
-                }
-                if (measureName === '-') {
-                    measureName = '';
-                }
-
-                var measureId
-                idx = colIndex['%MI%MeasureId'];
-                if (typeof idx != 'undefined'){
-                    measureId = cells[idx].qText;
-                }
-                if (measureId === '-') {
-                    measureId = '';
-                }
-
-                var expression
-                idx = colIndex['%MI%MeasureExpression'];
-                if (typeof idx != 'undefined'){
-                    expression = cells[idx].qText;
-                }
-                if (expression === '-') {
-                    expression = '';
-                }
-                // Filter and parse LABELEXPRESSION
-                var labelExpression
-                idx = colIndex['%MI%MeasureLabelExpression'];
-                if (typeof idx != 'undefined'){
-                    labelExpression = cells[idx].qText;
-                }
-                if (labelExpression === '-') {
-                    labelExpression = '';
-                }
-                // Filter and parse COLOR
-                var color
-                idx = colIndex['%MI%MeasureColor'];
-                if (typeof idx != 'undefined'){
-                    color = cells[idx].qText;
-                }
-                if (color === '-') {
-                    color = '';
-                }
-                // Filter and parse DESCRIPTION
-                var description;
-                idx = colIndex['%MI%MeasureDescription'];
-                if (typeof idx != 'undefined'){
-                    description = cells[idx].qText;
-                }
-                if (description === '-') {
-                    description = '';
-                }
-                // Filter and parse TAGS                
-                var tagsList = [];
-                idx = colIndex['%MI%MeasureTags'];
-                if (typeof idx != 'undefined'){
-                    var tags = cells[idx].qText;
-                    if (typeof tags != 'undefined') {
-                        tagsList = tags.split(",");
-                        //console.log(tagsList);
-                        tagsList = tagsList.filter(a => a !== '-');
-                    }
-                }
-                tagsList.push('Master Item Manager')
-                
-                // 2020-09-09 (RS) Filter and parse SEGMENTCOLOR                
-                var segmentColor
-                idx = colIndex['%MI%MeasureSegmentColor'];
-                if (typeof idx != 'undefined'){
-					
-					// Get the segment number format from config file
-                    var segmentTypeInput = cells[colIndex['%MI%MeasureSegmentColorFormat']].qText.toLowerCase();
-                    var segmentFormat;
-                    switch (true) {
-                      case segmentTypeInput == 'percent':
-                        segmentFormat = 'percent';
-                        break;
-                      case segmentTypeInput == 'fixed':
-                        segmentFormat = 'absolute';
-                        break;
-                      default:
-                        segmentFormat = 'percent';
-                    }
-                    
-                    // Get the segment color list from config file, then parse the value to JSON
-                    var segmentColorList = cells[idx].qText;
-                    if (segmentColorList === '-') {	
-                        if (actionType === 'UPDATE') {	
-                            segmentColor = gradient 	
-                        }{				
-                        segmentColor = ''
-                        }	
-                    }
-                    else {							
-                        var arr = segmentColorList.split(',')
-
-                        var colors=[]
-                        var limits=[]
-                        var breaks=[]
-
-                        for(let i = 0; i < arr.length; i++){
-                          var item = arr[i]
-                          var item_color = item.match('\#[A-Za-z0-9]{3,6}')[0]
-
-                          var item_index =  -1
-                          
-                          var item_limit
-                          if(segmentFormat == 'percent'){								  
-                            item_limit = +((parseFloat(item.substring(item.indexOf("|")+1,item.lastIndexOf('|')))/100).toFixed(2)).replace(/\.00$/, "")								
-                          }
-                          else{
-                            item_limit = +(parseFloat(item.substring(item.indexOf("|")+1,item.lastIndexOf('|'))))
-                          }
-
-                          var item_break = item.substring(item.lastIndexOf("|")+1).toLowerCase()
-                          var isBreakTrueSet = (item_break == 'true')
-                          
-                          colors.push({color:  item_color,index: item_index});
-        
-                          if(i<arr.length-1) {
-                              limits.push(item_limit);
-                              breaks.push(isBreakTrueSet);
-                          }
-
-                        }
-
-                        segmentColor = {colors: colors, limits: limits, breakTypes: breaks, limitType: segmentFormat};
-                    
-                    }
-                }
-				
-				var numFormat={};
-
-                idx = colIndex['%MI%MeasureFormatType'];
-                if (typeof idx != 'undefined'){
-				
-					// Filter and parse FormatType
-					var formatType;
-					idx = colIndex['%MI%MeasureFormatType'];
-                    if (typeof idx != 'undefined'){
-						formatType = cells[idx].qText;
+						return objValue;
 					}
-					if (formatType === '-') {
-						formatType = '';
-					}
-					numFormat.qType = formatType;
+				}
+				// Return a default value or handle the case where the key is not found
+				return ''; 
+			}
 
-					// Filter and parse FormatNDec
+			const ProcessMeasures = () => {
+				// Step 1: Create a Promise to handle asynchronous operations.
+				new Promise((resolve, reject) => {
+					// Step 2: Resolve the initial promise to create a session object.
+					resolve(
+						enigma.app.createSessionObject({
+							"qProp": {
+								"qInfo": {
+									"qType": "MeasureList"
+								},
+								"qMeasureListDef": {
+									"qType": "measure",
+									"qData": {
+										"title": "/title",
+										"tags": "/tags"
+									}
+								}
+							}
+						})
+					);
+				})
+				.then(measureList => {
+					// Step 3: Get the layout information for the MeasureList object.
+					return measureList.getLayout();
+				})
+				.then(measureListInfo => {
+					// Step 4: Extract measure definitions from MeasureList.
+					const measureDefinitions = measureListInfo.qMeasureList.qItems.map(async element => {
+						// Step 5: Fetch details for each measure using its qId.
+						const measureDetails = enigma.app.getMeasure(element.qInfo.qId);
+						return measureDetails;
+					});
+					return Promise.all(measureDefinitions); // Wait for all measure details to be fetched.
+				})
+				.then(measureGetProperties => {
+					// Step 6: Extract properties of the measure objects.
+					const measurePropertyArray = measureGetProperties.map(element => {
+						return element.getProperties();
+					});
+					return Promise.all(measurePropertyArray);
+				})
+				.then(measureListProperties => {
+					// Step 7: Create an array of measure details with more descriptive variable names.
+					const measureInfoArray = [];
+					measureListProperties.forEach(element => {
+						measureInfoArray.push({
+							id: element.qInfo.qId,
+							label: element.qMeasure.qLabel,
+							gradient: element.qMeasure.coloring.gradient,
+							numberFormat: element.qMeasure.qNumFormat
+						});
+					});
+					return measureInfoArray;
+				})
+				.then(measureInfoArray => {
+
+					// Step 8: Merge data from 'measureTable' and 'measureFormatTable' into 'mergedMeasureTable'.
+					const mergedMeasureTable = [];
+					for (let i = 0; i < measureTable.rows.length; i++) {
+						for (let j = 0; j < measureFormatTable.rows.length; j++) {
+							if (measureFormatTable.rows[j].cells[0].qText == measureTable.rows[i].cells[0].qText) {
+								mergedMeasureTable.push(measureTable.rows[i].cells.concat(measureFormatTable.rows[j].cells.slice(1)));
+							}
+						}
+					}
+			
+					// Step 9: Process the 'mergedMeasureTable' and create or update measures.			
+					mergedMeasureTable.forEach((cells, rowno) => {
+
+						let measureName = getValueByKey(cells, "%MI%MeasureName", "qText")
+						let measureId = getValueByKey(cells, "%MI%MeasureId", "qText")
+						let measureGradient = getValueByKey(measureInfoArray, measureId, "gradient")
+						let measureNumFormat = getValueByKey(measureInfoArray, measureId, "numberFormat")
+						const checkMeasureId = getValueByKey(measureInfoArray, measureId, "id")
+
+						if (checkMeasureId.length == 0) {
+							console.log(rowno + 1 + '. Creating Measure: ' + measureName + ', Id:' + measureId);
+							$scope.CreateMeasure = CreateMeasure('CREATE', cells);
+
+						} else {
+							console.log(rowno + 1 + '. Updating Measure: ' + measureName + ', Id:' + measureId);
+							$scope.CreateMeasure = CreateMeasure('UPDATE',  cells, measureGradient, measureNumFormat);
+						}
+					});
+				})
+				.then(() => {
+					// Step 10: Display a success message using the 'swal' library.
+					swal({
+						text: "Measures Created",
+						icon: "success"
+					});
+			
+					// Uncomment the following 'swal' message if needed.
+					// swal({
+					//     text: "Found Existing Measures. Synchronizing...",
+					//     icon: "warning"
+					// })
+				});
+			}
+			
+			const CreateMeasure = (actionType, cells, existingGradient, existingNumber) => {
+
+				// Extract data from the cells parameter
+				const measureName = getValueByKey(cells, "%MI%MeasureName", "qText");
+				const measureId = getValueByKey(cells, "%MI%MeasureId", "qText");
+				const expression = getValueByKey(cells, "%MI%MeasureExpression", "qText");
+				const labelExpression = getValueByKey(cells, "%MI%MeasureLabelExpression", "qText");
+				const color = getValueByKey(cells, "%MI%MeasureColor", "qText"); // Filter and parse COLOR
+				const description = getValueByKey(cells, "%MI%MeasureDescription", "qText");
+			
+				// Extract and process tags
+				const tagStr = getValueByKey(cells, "%MI%MeasureTags", "qText");
+				const tagList = tagStr.length > 0 ? tagStr.split(',') : [];
+				tagList.push('Master Item Manager');
+							
+
+
+				// Define the properties object for the measure
+				const properties = {
+					qInfo: {
+						qType: "measure",
+						qId: measureId.toString(),
+					},
+					qMeasure: {
+						qLabel: measureName,
+						qDef: expression,
+						qGrouping: "N",
+						qLabelExpression: labelExpression,
+						qExpressions: [],
+						coloring: {
+							baseColor: {
+								color: color,
+								index: -1,
+							}
+						},
+						qActiveExpression: 0
+					},
+					qMetaDef: {
+						title: measureName,
+						description: description,
+						tags: tagList,
+					},
+				};
+
+				// Determine segment color format
+				const segmentTypeInput = getValueByKey(cells, "%MI%MeasureSegmentColorFormat", "qText");
+
+				// Check if segment color is provided
+				if (segmentTypeInput.length > 0){
+
+					const segmentFormat = segmentTypeInput === 'fixed' ? 'absolute' : 'percent';
+				
+					// Extract and process segment colors
+					const segmentColorStr = getValueByKey(cells, "%MI%MeasureSegmentColor", "qText");
+					const segmentColorList = segmentColorStr.length > 0 ? segmentColorStr.split(',') : [];
+					const colors = [];
+					const limits = [];
+					const breaks = [];
+				
+					for (let i = 0; i < segmentColorList.length; i++) {
+						const item = segmentColorList[i];
+						const itemColor = item.match(/\#[A-Za-z0-9]{3,6}/)[0];
+						const itemIndex = -1;
+				
+						let itemLimit;
+						if (segmentFormat === 'percent') {
+							itemLimit = +(parseFloat(item.split('|')[1]) / 100).toFixed(2).replace(/\.00$/, "");
+						} else {
+							itemLimit = +(parseFloat(item.split('|')[1]));
+						}
+				
+						const itemBreak = item.substring(item.lastIndexOf("|") + 1).toLowerCase()
+						const isBreakTrueSet = (itemBreak === 'true');
+				
+						colors.push({
+							color: itemColor,
+							index: itemIndex
+						});
+				
+						if (i < segmentColorList.length - 1) {
+							limits.push(itemLimit);
+							breaks.push(isBreakTrueSet);
+						}
+					}
+
+					const segmentColor = {
+						colors,
+						limits,
+						breakTypes: breaks,
+						limitType: segmentFormat
+					}
+
+					// Assign the segment color to the measure properties
+					properties.qMeasure.coloring.gradient = segmentColor;
+				
+				} else {
+					// If the segment color is not provided, use existing values
+					properties.qMeasure.coloring.gradient = existingGradient || "";
+				}
+
+				// Extract number format properties
+				const formatType = getValueByKey(cells, "%MI%MeasureFormatType", "qText");
+			
+				// Check if number format properties are provided
+				if (formatType.length > 0) {
+			
+					const formatFmt = getValueByKey(cells, "%MI%MeasureFormatFmt", "qText");
+					const formatDec = getValueByKey(cells, "%MI%MeasureFormatDec", "qText");
+					const formatThou = getValueByKey(cells, "%MI%MeasureFormatThou", "qText");
+
 					var formatNDec;
-					idx = colIndex['%MI%MeasureFormatNDec'];
-                    if (typeof idx != 'undefined'){
-						formatNDec = cells[idx].qText;
+					if (formatType == 'U') {
+						formatNDec = 10;
+					} else {
+						formatNDec = 2;
 					}
-					if (formatNDec === '-') {
-						formatNDec = '';
-					}
-                    numFormat.qnDec = parseInt(formatNDec);
-					
-					// Filter and parse FormatUseThou
-					var formatUseThou;
-					idx = colIndex['%MI%MeasureFormatUseThou'];
-                    if (typeof idx != 'undefined'){
-						formatUseThou = cells[idx].qText;
-					}
-					if (formatUseThou === '-') {
-						formatUseThou = '';
-					}
-                    numFormat.qUseThou = parseInt(formatUseThou);
-					
-					// Filter and parse FormatFmt
-					idx = colIndex['%MI%MeasureFormatFmt'];
-                    if (typeof idx != 'undefined'){
-						formatFmt = cells[idx].qText;
-					}
-					if (formatFmt === '-') {
-						formatFmt = '';
-					}
-					numFormat.qFmt = formatFmt;
+					const formatUseThou = 0;  // always 0, parseInt(getValueByKey(cells, "%MI%MeasureFormatUseThou", "qText")); 
 
-					// Filter and parse FormatDec
-					var formatDec;
-					idx = colIndex['%MI%MeasureFormatDec'];
-                    if (typeof idx != 'undefined'){
-						formatDec = cells[idx].qText;
+					const numberFormat = {
+						qnDec: formatNDec,
+						qUseThou: formatUseThou,
+						qFmt: formatFmt,
+						qDec: formatDec,
+						qType: formatType,
+						qThou: formatThou
 					}
-					if (formatDec === '-') {
-						formatDec = '';
-					}
-                    numFormat.qDec = formatDec;
-									
-					// Filter and parse FormatThou
-					var formatThou;
-					idx = colIndex['%MI%MeasureFormatThou'];
-                    if (typeof idx != 'undefined'){
-						formatThou = cells[idx].qText;
-					}
-					if (formatThou === '-') {
-						formatThou = '';
-					}
-                    numFormat.qThou = formatThou;
-                }    
-                
-                var properties = {
-                    "qInfo": {
-                        "qType": "measure",
-                        "qId": measureId.toString()
-                    },
-                    "qMeasure": {
-                        "qLabel": measureName,
-                        "qDef": expression,
-                        "qGrouping": "N",
-                        "qLabelExpression": labelExpression,
-                        "qExpressions": [],
-                        "coloring": {
-                            "baseColor": {
-                                "color": color,
-                                "index": -1
-                            },
-                            "gradient": segmentColor 
-                        },
-                        "qActiveExpression": 0,
-						"qNumFormat": numFormat
-                    },
-                    "qMetaDef": {
-                        "title": measureName,
-                        "description": description, 
-                        "tags": tagsList, 
-                    }
-                };
-
-				if (actionType === 'UPDATE') {	
-                    enigma.app.getMeasure(measureId).then(reply => {
-                        reply.setProperties(properties);
-                    });
-                } else {
-                    enigma.app.createMeasure(properties);
-                }         
-
-            }
+			
+					// Assign the number format to the measure properties
+					properties.qMeasure.qNumFormat = numberFormat;
+			
+				} else {
+					// If the number format is not provided, use existing values
+					properties.qMeasure.qNumFormat = existingNumber;
+				}
+			
+				// Determine the action (create or update) and perform the appropriate action
+				if (actionType === 'UPDATE') {
+					enigma.app.getMeasure(measureId).then(reply => {
+						reply.setProperties(properties);
+					});
+				} else {
+					enigma.app.createMeasure(properties);
+				}
+			}
+			
 
             const DestroyMeasure = () => {
                 // 1. Create in memory table of Measures Loaded into the MIM App
@@ -816,6 +640,7 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                 })
 
             };
+
             // MODAL FUNCTIONS
             const ConfirmDialogMeas = () => {
                 luiDialog.show({
@@ -832,7 +657,6 @@ function ($, qlik, mainModalWindow, helpModalWindow, dimModalWindow, dimModalCon
                                 alignTo: document.getElementsByClassName("popover")[index], //This is the key to making the popover work and attach to the element
                                 dock: "right",
                                 controller: ['$scope', function ($scope) {
-                                    $scope.measureTable = measureTable;
                                     let measureHeader = measureTable.headers.filter(item => item.qCardinal !== 0)                    
                                     let headerColIndex = {}
                                     for(let i=0;i<measureHeader.length;i++){
