@@ -47,8 +47,12 @@ REPLACE LOAD
 	[%MI%MeasureDescription],
 	[%MI%MeasureColor],
 	[%MI%MeasureTags],
-	[%MI%MeasureSegmentColor],
-	[%MI%MeasureSegmentColorFormat],
+	[%MI%MeasureSegmentColor], // optional
+	[%MI%MeasureSegmentColorFormat], // optional
+	[%MI%MeasureFormatType], // optional
+	[%MI%MeasureFormatFmt],	// optional
+	[%MI%MeasureFormatDec],	// optional
+	[%MI%MeasureFormatThou],// optional
 	[%MI%MeasureId]
  FROM [lib://AttachedFiles/Master Item Manager.xlsx]
 (ooxml, embedded labels, table is Measures);
@@ -99,6 +103,10 @@ Editing Measures:
 - 2022-09-06: Fixes for media image links (.tff and .woff) display incorrect on Qlik Sense Enterprise
 - 2022-12-21: Major updates on js code for handling missing columns in config file
 - 2022-12-21: Fixed the master item preview that was not displaying correctly due to a missing config column
+- 2023-10-23: Fix the configuration to manage the custom number format for measures through the config file. Note that the existing measure number format will stay if the custom format is not configured in the config file.
+- 2023-10-23: Improve code readability and fix some script logic
+- 2023-10-23: Added more samples to the config file
+
 
 # Known Issues and Limitations
 	- Complex drilldown dimension expression is not supported.
